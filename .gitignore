@@ -1,0 +1,29 @@
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+env/
+venv/
+.venv/
+
+# VSCode settings (optional)
+.vscode/
+
+# Mac/Linux hidden files
+.DS_Store
+
+# Model files
+*.joblib
+*.pkl
+*.h5
+
+# Logs or cache
+*.log
+*.cache
+.cache/

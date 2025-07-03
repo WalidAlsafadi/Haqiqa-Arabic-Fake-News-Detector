@@ -1,0 +1,2 @@
+# Palestine-Fake-News-Detector
+
