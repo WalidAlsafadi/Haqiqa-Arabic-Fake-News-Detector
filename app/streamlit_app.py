@@ -6,7 +6,6 @@ import streamlit as st
 import joblib
 import pandas as pd
 from src.preprocessing.cleaning import clean_arabic_text_minimal
-from src.utils.logger import log_step, log_success
 
 st.set_page_config(page_title="كاشف الأخبار الكاذبة لفلسطين", layout="centered")
 
@@ -57,8 +56,7 @@ st.markdown(
 def load_model():
     return joblib.load(MODEL_PATH)
 
-model = load_model()
-log_success("Model loaded successfully.")
+#model = load_model()
 
 # -----------------------------
 # Page Header
