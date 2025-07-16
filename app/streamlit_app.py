@@ -65,6 +65,7 @@ log_success("Model loaded successfully.")
 # -----------------------------
 st.markdown("<div class='main-title'>📰 كاشف الأخبار الكاذبة لفلسطين</div>", unsafe_allow_html=True)
 st.markdown("<div class='subtext'>أدخل عنوان خبر أو مقطعًا إخباريًا باللغة العربية لتحديد ما إذا كان <strong>حقيقيًا</strong> أو <strong>كاذبًا</strong>.</div>", unsafe_allow_html=True)
+st.markdown("<div class='subtext'>📌 هذا النموذج قد يُخطئ أحيانًا. يعمل بشكل أفضل مع الأخبار الفلسطينية.</div>", unsafe_allow_html=True)
 
 # -----------------------------
 # Session History
@@ -112,17 +113,3 @@ if st.session_state.history:
     st.subheader("🧾 السجل (آخر 10 نتائج)")
     df_hist = pd.DataFrame(st.session_state.history[-10:])
     st.dataframe(df_hist[::-1], use_container_width=True)
-
-# -----------------------------
-# Footer
-# -----------------------------
-st.markdown("""
----
-<div class="footer">
-    Developed by <strong>Walid Alsafadi</strong><br>
-    Contact: <a href="mailto:walid.k.alsafadi@gmail.com">walid.k.alsafadi@gmail.com</a><br>
-    <a href="https://github.com/WalidAlsafadi" target="_blank">GitHub</a> |
-    <a href="https://linkedin.com/in/WalidAlsafadi" target="_blank">LinkedIn</a> |
-    <a href="https://x.com/WalidAlsafadi" target="_blank">X</a>
-</div>
-""", unsafe_allow_html=True)

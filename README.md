@@ -61,7 +61,7 @@ $ streamlit run app/app.py
 ## 🌍 Live Demo
 
 The app is live on **Streamlit Cloud**:
-🔗 [View Demo](https://share.streamlit.io/your-deployment-url)
+🔗 [View Demo](https://palestine-fake-news-detector.streamlit.app/)
 
 ## 📁 Project Structure
 

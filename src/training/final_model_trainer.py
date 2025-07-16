@@ -63,7 +63,7 @@ if MODEL_TYPE == "xgb":
 elif MODEL_TYPE == "rf":
     from sklearn.ensemble import RandomForestClassifier
     clf = RandomForestClassifier(
-        n_estimators=200,
+        n_estimators=2000,
         class_weight="balanced",
         random_state=SEED
     )
@@ -115,7 +115,7 @@ eval_df = pd.DataFrame({"y_true": y_test, "y_pred": y_pred})
 eval_df.to_csv(os.path.join(OUTPUT_DIR, "test_eval.csv"), index=False)
 
 # Save text report
-with open(os.path.join(OUTPUT_DIR, "test_report.txt"), "w", encoding="utf-8") as f:
+with open(os.path.join(OUTPUT_DIR, "final_test_report.txt"), "w", encoding="utf-8") as f:
     f.write(report)
 
 log_success("Test evaluation results saved.")

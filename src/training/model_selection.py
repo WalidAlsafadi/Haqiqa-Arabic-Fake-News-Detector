@@ -48,19 +48,19 @@ results = []
 
 pipelines = {
     "LogisticRegression": Pipeline([
-        ("tfidf", TfidfVectorizer(max_features=5000, ngram_range=(1, 2))),
-        ("clf", LogisticRegression(max_iter=1000, class_weight="balanced", random_state=SEED))
+        ("tfidf", TfidfVectorizer(max_features=1000, ngram_range=(1, 2))),
+        ("clf", LogisticRegression(max_iter=100, class_weight="balanced", random_state=SEED))
     ]),
     "MultinomialNB": Pipeline([
-        ("tfidf", TfidfVectorizer(max_features=5000, ngram_range=(1, 2))),
+        ("tfidf", TfidfVectorizer(max_features=1000, ngram_range=(1, 2))),
         ("clf", MultinomialNB())
     ]),
     "RandomForest": Pipeline([
-        ("tfidf", TfidfVectorizer(max_features=5000, ngram_range=(1, 2))),
+        ("tfidf", TfidfVectorizer(max_features=1000, ngram_range=(1, 2))),
         ("clf", RandomForestClassifier(n_estimators=100, class_weight="balanced", random_state=SEED))
     ]),
     "XGBoost": Pipeline([
-        ("tfidf", TfidfVectorizer(max_features=5000, ngram_range=(1, 2))),
+        ("tfidf", TfidfVectorizer(max_features=1000, ngram_range=(1, 2))),
         ("clf", XGBClassifier(n_estimators=100, eval_metric="logloss", scale_pos_weight=1.8, random_state=SEED))
     ])
 }
