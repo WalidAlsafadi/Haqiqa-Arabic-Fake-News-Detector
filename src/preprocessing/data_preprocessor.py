@@ -2,9 +2,6 @@ import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
-import nltk
-nltk.download("punkt")
-
 from src.preprocessing.cleaning import apply_all_cleaning
 from src.utils.logger import log_info, log_step, log_success
 

@@ -56,7 +56,7 @@ st.markdown(
 def load_model():
     return joblib.load(MODEL_PATH)
 
-#model = load_model()
+model = load_model()
 
 # -----------------------------
 # Page Header

@@ -5,6 +5,9 @@ from nltk.tokenize import word_tokenize
 from arabicstopwords.arabicstopwords import stopwords_list
 from src.utils.logger import log_info, log_step, log_success
 
+import nltk
+nltk.download("punkt")
+
 ARABIC_STOPWORDS = set(stopwords_list())
 
 def normalize_arabic(text):
