@@ -51,6 +51,19 @@ def remove_outliers_iqr(df: pd.DataFrame, col: str = 'content_length') -> pd.Dat
     upper = Q3 + 1.5 * IQR
     return df[(df[col] >= lower) & (df[col] <= upper)]
 
+def prepare_text_for_transformers(path: str) -> pd.DataFrame:
+    df = pd.read_csv(path)
+    df = df.rename(columns={"News content": "content", "Label": "label"})
+
+    df["title"] = df["title"].fillna("").astype(str)
+    df["content"] = df["content"].fillna("").astype(str)
+    df["text"] = df["title"] + " " + df["content"]
+    df["label"] = df["label"].str.lower().map({"real": 0, "fake": 1})
+
+    df = df[["text", "label"]].dropna()
+    log_success("Transformer-ready dataset prepared.")
+    return df
+
 def apply_all_cleaning(path: str, remove_outliers: bool = True) -> pd.DataFrame:
     df = pd.read_csv(path)
 
