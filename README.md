@@ -20,9 +20,11 @@ Misinformation about Palestine has surged across platforms like Telegram and soc
 
 - **Model**: XGBoost (with TF-IDF features), trained as a full pipeline
 - **Evaluation**:
-  - F1-score: **0.846**
-  - Accuracy: **0.91**
-  - 5-fold CV: Mean F1 **0.829**, Std **±0.018**
+  - F1-score (class 1 / "fake"): **0.846**
+  - Weighted F1-score: **0.910**
+  - Macro F1-score: **0.891**
+  - Accuracy: **0.909**
+  - 5-fold CV: Mean F1 (class 1 / "fake") **0.829**, Std **±0.018**
 - **Data**:
   - ~5,352 Arabic news entries
   - Date range: 2023–2025
