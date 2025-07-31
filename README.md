@@ -19,13 +19,15 @@ This project addresses the critical issue of misinformation about Palestine acro
 ## Model Performance
 
 ### Performance Metrics (Test Set - Never Seen During Training)
+
 - **Test F1 (weighted)**: **91.48%**
-- **Test Accuracy**: **91.38%** 
+- **Test Accuracy**: **91.38%**
 - **Test AUC**: **96.74%**
 - **Real News F1**: **93.84%**
 - **Fake News F1**: **85.66%**
 
 ### Scientific Methodology
+
 - **Proper Data Splits**: 60% train, 20% validation, 20% test (consistent throughout)
 - **No Data Leakage**: TF-IDF fitted only on training data
 - **Validation-Based Tuning**: Hyperparameters optimized on validation set
@@ -33,16 +35,17 @@ This project addresses the critical issue of misinformation about Palestine acro
 - **Reproducible Results**: Consistent splits saved and reused across pipeline
 
 ### Technical Architecture
+
 - **Model**: XGBoost with optimized hyperparameters
 - **Features**: TF-IDF vectorization (5000 features, Arabic-optimized)
-- **Preprocessing**: Three cleaning levels (minimal, aggressive, transformers-ready) 
+- **Preprocessing**: Three cleaning levels (minimal, aggressive, transformers-ready)
 - **Evaluation**: Confusion matrix, ROC curve, precision-recall curves
 
 ## Tech Stack
 
 - **Python 3.12** - Core programming language
 - **Scikit-learn & XGBoost** - Machine learning frameworks
-- **NLTK** - Arabic text processing  
+- **NLTK** - Arabic text processing
 - **Streamlit** - Web interface for deployment
 - **Pandas/NumPy** - Data manipulation
 - **Matplotlib/Seaborn** - Visualization and plots
@@ -51,6 +54,7 @@ This project addresses the critical issue of misinformation about Palestine acro
 ## Quick Start
 
 ### Installation
+
 ```bash
 # Clone repository
 git clone https://github.com/WalidAlsafadi/Palestine-Fake-News-Detector
@@ -67,12 +71,14 @@ pip install -r requirements.txt
 ### Running the ML Pipeline
 
 #### Complete Pipeline (Recommended)
+
 ```bash
 # Run full scientific pipeline
 python main.py --all
 ```
 
 #### Individual Phases (For Development/Testing)
+
 ```bash
 # Data preparation and cleaning
 python main.py --data-prep
@@ -91,12 +97,14 @@ python main.py --config
 ```
 
 ### Running the Web App
+
 ```bash
 # Launch Streamlit interface
 streamlit run app/streamlit_app.py
 ```
 
 ## Dataset Information
+
 - **Size**: 4,521 Arabic news articles (after cleaning)
 - **Time Period**: 2023-2025
 - **Languages**: Arabic with Palestinian dialect support
@@ -129,7 +137,7 @@ Palestine-Fake-News-Detector/
 │   └── trained/                   # Production-ready models
 ├── outputs/
 │   ├── model_selection/           # Cross-validation results
-│   ├── hyperparameter_tuning/     # Tuning results  
+│   ├── hyperparameter_tuning/     # Tuning results
 │   └── final_evaluation/          # Test metrics & visualizations
 └── notebooks/                     # Exploratory data analysis
 ```

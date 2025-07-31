@@ -92,7 +92,7 @@ Examples:
             from src.preprocessing.text_cleaner import prepare_data
             from src.utils.data_splits import create_data_splits
             from src.models.model_selection import compare_models_on_datasets
-            from src.models.hyperparameter_tuning_proper import tune_best_models_proper
+            from src.models.hyperparameter_tuning import tune_best_models_proper
             from src.models.model_evaluation import evaluate_final_model_properly
             
             # Data Loading Stage
@@ -339,7 +339,7 @@ Examples:
             import pandas as pd
             import os
             from src.models.model_selection import load_model_selection_results
-            from src.models.hyperparameter_tuning_proper import tune_best_models_proper
+            from src.models.hyperparameter_tuning import tune_best_models_proper
             from src.utils.data_splits import load_data_splits
             
             # Check if model selection results exist
