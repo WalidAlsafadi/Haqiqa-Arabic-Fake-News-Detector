@@ -1,0 +1,72 @@
+{
+  "XGBoost_minimal": {
+    "model_name": "XGBoost",
+    "dataset": "minimal",
+    "cv_f1_mean": 0.9048710812394184,
+    "cv_f1_std": 0.012653459743276745,
+    "report_file": "outputs/model_selection/XGBoost_minimal_report.txt"
+  },
+  "Random Forest_minimal": {
+    "model_name": "Random Forest",
+    "dataset": "minimal",
+    "cv_f1_mean": 0.8937929963642377,
+    "cv_f1_std": 0.014601085392553613,
+    "report_file": "outputs/model_selection/Random Forest_minimal_report.txt"
+  },
+  "Logistic Regression_minimal": {
+    "model_name": "Logistic Regression",
+    "dataset": "minimal",
+    "cv_f1_mean": 0.8736730663796853,
+    "cv_f1_std": 0.01227304896334001,
+    "report_file": "outputs/model_selection/Logistic Regression_minimal_report.txt"
+  },
+  "SVM_minimal": {
+    "model_name": "SVM",
+    "dataset": "minimal",
+    "cv_f1_mean": 0.8876881058235979,
+    "cv_f1_std": 0.012985272088950155,
+    "report_file": "outputs/model_selection/SVM_minimal_report.txt"
+  },
+  "Naive Bayes_minimal": {
+    "model_name": "Naive Bayes",
+    "dataset": "minimal",
+    "cv_f1_mean": 0.8706807887716318,
+    "cv_f1_std": 0.011766438800353876,
+    "report_file": "outputs/model_selection/Naive Bayes_minimal_report.txt"
+  },
+  "XGBoost_aggressive": {
+    "model_name": "XGBoost",
+    "dataset": "aggressive",
+    "cv_f1_mean": 0.906053867439439,
+    "cv_f1_std": 0.014978417823060971,
+    "report_file": "outputs/model_selection/XGBoost_aggressive_report.txt"
+  },
+  "Random Forest_aggressive": {
+    "model_name": "Random Forest",
+    "dataset": "aggressive",
+    "cv_f1_mean": 0.8908133124820111,
+    "cv_f1_std": 0.013484176109072304,
+    "report_file": "outputs/model_selection/Random Forest_aggressive_report.txt"
+  },
+  "Logistic Regression_aggressive": {
+    "model_name": "Logistic Regression",
+    "dataset": "aggressive",
+    "cv_f1_mean": 0.8703449712403655,
+    "cv_f1_std": 0.01237230730533005,
+    "report_file": "outputs/model_selection/Logistic Regression_aggressive_report.txt"
+  },
+  "SVM_aggressive": {
+    "model_name": "SVM",
+    "dataset": "aggressive",
+    "cv_f1_mean": 0.8824908263519768,
+    "cv_f1_std": 0.013018699002946029,
+    "report_file": "outputs/model_selection/SVM_aggressive_report.txt"
+  },
+  "Naive Bayes_aggressive": {
+    "model_name": "Naive Bayes",
+    "dataset": "aggressive",
+    "cv_f1_mean": 0.8686087359513426,
+    "cv_f1_std": 0.01179162957412062,
+    "report_file": "outputs/model_selection/Naive Bayes_aggressive_report.txt"
+  }
+}

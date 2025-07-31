@@ -5,15 +5,17 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import streamlit as st
 import joblib
 import pandas as pd
-from src.preprocessing.cleaning import clean_arabic_text_minimal
+from sklearn.feature_extraction.text import TfidfVectorizer
+from src.preprocessing.text_cleaner import clean_arabic_text_minimal
 
 st.set_page_config(page_title="كاشف الأخبار الكاذبة لفلسطين", layout="centered")
 
 # -----------------------------
 # Model & App Config
 # -----------------------------
-MODEL_PATH = "models/model_final_xgb_pipeline.pkl"
-THRESHOLD = 0.45
+MODEL_PATH = "models/trained/XGBoost_minimal_best_model.pkl"
+VECTORIZER_PATH = "models/trained/fitted_vectorizer.pkl"
+THRESHOLD = 0.5
 MIN_CHARS = 30
 
 # -----------------------------
@@ -50,13 +52,46 @@ st.markdown(
 )
 
 # -----------------------------
-# Load model
+# Load model and vectorizer
 # -----------------------------
 @st.cache_resource
-def load_model():
-    return joblib.load(MODEL_PATH)
+def load_model_and_vectorizer():
+    """Load the trained model and fitted vectorizer"""
+    try:
+        import pickle
+        
+        # Load the trained model
+        with open(MODEL_PATH, 'rb') as f:
+            model = pickle.load(f)
+        
+        # Load the fitted vectorizer
+        with open(VECTORIZER_PATH, 'rb') as f:
+            vectorizer = pickle.load(f)
+            
+        return model, vectorizer
+    except Exception as e:
+        st.error(f"Error loading model: {str(e)}")
+        return None, None
 
-model = load_model()
+model, vectorizer = load_model_and_vectorizer()
+
+def predict_news(text, model, vectorizer):
+    """Predict if news is fake or real"""
+    try:
+        # Clean the text
+        cleaned_text = clean_arabic_text_minimal(text)
+        
+        # Vectorize the text using the trained vectorizer
+        X_vectorized = vectorizer.transform([cleaned_text])
+        
+        # Get prediction probabilities
+        prob_fake = model.predict_proba(X_vectorized)[0][1]
+        prob_real = 1 - prob_fake
+        
+        return prob_fake, prob_real, cleaned_text
+    except Exception as e:
+        st.error(f"Prediction error: {str(e)}")
+        return None, None, None
 
 # -----------------------------
 # Page Header
@@ -83,26 +118,28 @@ if st.button("تحليل الخبر"):
         st.warning("يرجى إدخال نص إخباري باللغة العربية.")
     elif char_count < MIN_CHARS:
         st.warning(f"🔍 للحصول على نتيجة أدق، أدخل {MIN_CHARS} حرفًا على الأقل.")
+    elif model is None or vectorizer is None:
+        st.error("خطأ في تحميل النموذج. يرجى المحاولة مرة أخرى.")
     else:
-        cleaned = clean_arabic_text_minimal(text_input)
-        prob_fake = model.predict_proba([cleaned])[0][1]
-        prob_real = 1 - prob_fake
-        is_fake = int(prob_fake > THRESHOLD)
+        # Use the new prediction pipeline
+        prob_fake, prob_real, cleaned = predict_news(text_input, model, vectorizer)
+        
+        if prob_fake is not None:
+            is_fake = int(prob_fake > THRESHOLD)
+            label = "❌ كاذب" if is_fake else "✅ حقيقي"
+            confidence = f"{prob_real * 100:.2f}% صحيح"
 
-        label = "❌ كاذب" if is_fake else "✅ حقيقي"
-        confidence = f"{prob_real * 100:.2f}% صحيح"
+            st.markdown(f"### التقييم: **{label}**")
+            st.markdown(f"#### النتيجة: `{confidence}`")
 
-        st.markdown(f"### التقييم: **{label}**")
-        st.markdown(f"#### النتيجة: `{confidence}`")
+            st.session_state.history.append({
+                "النص المُدخل": text_input.strip(),
+                "التقييم": label,
+                "الثقة": confidence
+            })
 
-        st.session_state.history.append({
-            "النص المُدخل": text_input.strip(),
-            "التقييم": label,
-            "الثقة": confidence
-        })
-
-        with st.expander("🔍 النص بعد التنظيف"):
-            st.write(cleaned)
+            with st.expander("🔍 النص بعد التنظيف"):
+                st.write(cleaned)
 
 # -----------------------------
 # Prediction History
