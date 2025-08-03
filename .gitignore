@@ -93,14 +93,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# ML Models and Data
-# Uncomment to track models in git (not recommended for large files)
-models/trained/*.pkl
-*.pkl
-*.joblib
-*.h5
-*.hdf5
-
 # Generated outputs (can be reproduced by running pipeline)
 outputs/model_selection/*.txt
 outputs/model_selection/*.pkl
