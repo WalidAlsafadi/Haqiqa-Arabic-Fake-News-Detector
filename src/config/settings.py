@@ -2,46 +2,27 @@
 Configuration settings for Palestine Fake News Detection Pipeline
 
 This module contains all configuration parameters used throughout the ML pipeline.
+All settings are derived from EDA analysis and proven to work with the current pipeline.
 """
 
-# ==================== CORE SETTINGS ====================
+# ==================== DATA PATHS ====================
 
-# Logging
-USE_PROFESSIONAL_LOGGING = True
-LOG_LEVEL = "INFO"
+DATASET_PATH = "data/raw/original_news_data.csv"
 
-# Data Processing
-DATASETS_TO_USE = ["text_minimal", "text_aggressive", "text_transformers"]  # Column names after cleaning
-REMOVE_OUTLIERS = True
-MIN_TEXT_LENGTH = 10
+# ==================== MODEL TRAINING ====================
 
-# Model Training
-CV_FOLDS = 5  # Cross-validation folds
+# Cross-validation and reproducibility
+CV_FOLDS = 5
 RANDOM_STATE = 42
-TEST_SIZE = 0.2
 
-# TF-IDF Features
+# TF-IDF Vectorization (optimized for Arabic text)
 TFIDF_MAX_FEATURES = 5000
 TFIDF_MIN_DF = 2    # Ignore rare words (appear in < 2 documents)
 TFIDF_MAX_DF = 0.8  # Ignore common words (appear in > 80% of documents)
 
-# ==================== HELPER FUNCTIONS ====================
+# ==================== TEXT PREPROCESSING ====================
 
-def get_datasets():
-    """Get list of datasets to process"""
-    return [f"{dataset}.csv" for dataset in DATASETS_TO_USE]
-
-def print_config():
-    """Print current configuration"""
-    print("PALESTINE FAKE NEWS DETECTION - CONFIGURATION")
-    print("=" * 50)
-    print(f"📊 Datasets: {DATASETS_TO_USE}")
-    print(f"🔄 CV Folds: {CV_FOLDS}")
-    print(f"🎯 Random State: {RANDOM_STATE}")
-    print(f"📝 Max TF-IDF Features: {TFIDF_MAX_FEATURES}")
-    print(f"📋 Min Document Frequency: {TFIDF_MIN_DF}")
-    print(f"📋 Max Document Frequency: {TFIDF_MAX_DF}")
-    print("=" * 50)
-
-if __name__ == "__main__":
-    print_config()
+# Preprocessing Constants (derived from EDA analysis)
+MIN_PLATFORM_FREQUENCY = 30      # Minimum frequency to keep platform separate
+MIN_CONTENT_LENGTH = 10          # Minimum content length to keep article
+ANALYSIS_START_DATE = '2023-01-01'  # Start date for analysis period

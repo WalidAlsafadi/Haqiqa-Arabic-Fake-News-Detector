@@ -1,141 +1,175 @@
-"""
-Data splitting utilities for consistent train/validation/test splits across the ML pipeline.
-
-This ensures that:
-1. The same test set is held out throughout the entire pipeline
-2. TF-IDF is fitted only on training data
-3. Hyperparameter tuning uses validation set
-4. Final evaluation uses the held-out test set
-"""
-
 import os
 import pickle
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from src.config.settings import RANDOM_STATE
 
-def create_data_splits(text_minimal, text_aggressive, y, save_splits=True):
-    """
-    Create consistent train/validation/test splits for both datasets.
+class DataSplitter:
+    """Simple and efficient data splitting with consistent indices"""
     
-    Split Strategy:
-    - Train: 60% (for model training and cross-validation)
-    - Validation: 20% (for hyperparameter tuning)
-    - Test: 20% (for final evaluation only - held out)
+    def __init__(self, train_size=0.6, val_size=0.2, test_size=0.2, random_state=RANDOM_STATE):
+        """
+        Initialize DataSplitter with configurable split ratios.
+        
+        Args:
+            train_size: Proportion for training (default: 0.6)
+            val_size: Proportion for validation (default: 0.2) 
+            test_size: Proportion for testing (default: 0.2)
+            random_state: Random seed for reproducibility
+        """
+        if abs(train_size + val_size + test_size - 1.0) > 1e-6:
+            raise ValueError("Split sizes must sum to 1.0")
+            
+        self.train_size = train_size
+        self.val_size = val_size
+        self.test_size = test_size
+        self.random_state = random_state
+        self.train_indices = None
+        self.val_indices = None
+        self.test_indices = None
     
-    Args:
-        text_minimal: Minimal cleaned text data
-        text_aggressive: Aggressive cleaned text data  
-        y: Target labels
-        save_splits: Whether to save split indices for consistency
+    def create_splits(self, df, target='label', save_splits=True):
+        """
+        Create train/validation/test splits based on target distribution.
+        
+        Args:
+            df: DataFrame with data to split
+            target: Target column name for stratification
+            save_splits: Whether to save split indices to disk
+        """
+        print(f"Creating stratified splits: {self.train_size:.0%} train, {self.val_size:.0%} val, {self.test_size:.0%} test")
+        
+        y = df[target]
+        indices = list(range(len(df)))
+        
+        # First split: separate test set
+        train_val_indices, test_indices = train_test_split(
+            indices, test_size=self.test_size, random_state=self.random_state, 
+            stratify=y
+        )
+        
+        # Second split: separate train and validation from remaining data
+        val_ratio = self.val_size / (self.train_size + self.val_size)
+        train_indices, val_indices = train_test_split(
+            train_val_indices, test_size=val_ratio, random_state=self.random_state,
+            stratify=y.iloc[train_val_indices]
+        )
+        
+        self.train_indices = sorted(train_indices)
+        self.val_indices = sorted(val_indices)
+        self.test_indices = sorted(test_indices)
+        
+        print(f"Split created: {len(self.train_indices)} train, {len(self.val_indices)} val, {len(self.test_indices)} test")
+        
+        if save_splits:
+            self._save_splits()
     
-    Returns:
-        dict: Contains all splits for both datasets
-    """
+    def get_train(self, df, text_column='text_minimal', target='label'):
+        """Get training data for specified text column"""
+        self._check_splits_exist()
+        return (df[text_column].iloc[self.train_indices].reset_index(drop=True),
+                df[target].iloc[self.train_indices].reset_index(drop=True))
     
-    print("Creating consistent train/validation/test splits...")
-    print("Split strategy: 60% train, 20% validation, 20% test")
+    def get_val(self, df, text_column='text_minimal', target='label'):
+        """Get validation data for specified text column"""
+        self._check_splits_exist()
+        return (df[text_column].iloc[self.val_indices].reset_index(drop=True),
+                df[target].iloc[self.val_indices].reset_index(drop=True))
     
-    # First split: separate test set (20%)
-    indices = range(len(y))
-    train_val_indices, test_indices, y_train_val, y_test = train_test_split(
-        indices, y, test_size=0.2, random_state=RANDOM_STATE, stratify=y
-    )
+    def get_test(self, df, text_column='text_minimal', target='label'):
+        """Get test data for specified text column (use only for final evaluation!)"""
+        self._check_splits_exist()
+        return (df[text_column].iloc[self.test_indices].reset_index(drop=True),
+                df[target].iloc[self.test_indices].reset_index(drop=True))
     
-    # Second split: train (60% of total) and validation (20% of total)
-    train_indices, val_indices, y_train, y_val = train_test_split(
-        train_val_indices, y_train_val, test_size=0.25,  # 0.25 * 0.8 = 0.2 of total
-        random_state=RANDOM_STATE, stratify=y_train_val
-    )
+    def get_train_val(self, df, text_column='text_minimal', target='label'):
+        """Get combined train+validation data (useful for cross-validation)"""
+        self._check_splits_exist()
+        combined_indices = sorted(self.train_indices + self.val_indices)
+        return (df[text_column].iloc[combined_indices].reset_index(drop=True),
+                df[target].iloc[combined_indices].reset_index(drop=True))
     
-    # Create splits for minimal dataset
-    minimal_splits = {
-        'train_text': text_minimal.iloc[train_indices].reset_index(drop=True),
-        'val_text': text_minimal.iloc[val_indices].reset_index(drop=True), 
-        'test_text': text_minimal.iloc[test_indices].reset_index(drop=True),
-        'train_labels': y.iloc[train_indices].reset_index(drop=True),
-        'val_labels': y.iloc[val_indices].reset_index(drop=True),
-        'test_labels': y.iloc[test_indices].reset_index(drop=True)
-    }
     
-    # Create splits for aggressive dataset
-    aggressive_splits = {
-        'train_text': text_aggressive.iloc[train_indices].reset_index(drop=True),
-        'val_text': text_aggressive.iloc[val_indices].reset_index(drop=True),
-        'test_text': text_aggressive.iloc[test_indices].reset_index(drop=True), 
-        'train_labels': y.iloc[train_indices].reset_index(drop=True),
-        'val_labels': y.iloc[val_indices].reset_index(drop=True),
-        'test_labels': y.iloc[test_indices].reset_index(drop=True)
-    }
+    def get_train_from_csv(self, csv_path, text_column='text', target='label'):
+        """Get training data from CSV file using saved indices"""
+        self._check_splits_exist()
+        df = pd.read_csv(csv_path)
+        return (df[text_column].iloc[self.train_indices].reset_index(drop=True),
+                df[target].iloc[self.train_indices].reset_index(drop=True))
     
-    splits = {
-        'minimal': minimal_splits,
-        'aggressive': aggressive_splits,
-        'split_info': {
-            'train_size': len(train_indices),
-            'val_size': len(val_indices),
-            'test_size': len(test_indices),
-            'total_size': len(y),
-            'train_indices': train_indices,
-            'val_indices': val_indices,
-            'test_indices': test_indices
-        }
-    }
+    def get_val_from_csv(self, csv_path, text_column='text', target='label'):
+        """Get validation data from CSV file using saved indices"""
+        self._check_splits_exist()
+        df = pd.read_csv(csv_path)
+        return (df[text_column].iloc[self.val_indices].reset_index(drop=True),
+                df[target].iloc[self.val_indices].reset_index(drop=True))
     
-    print(f"Data splits created:")
-    print(f"   Train: {len(train_indices)} samples ({len(train_indices)/len(y)*100:.1f}%)")
-    print(f"   Validation: {len(val_indices)} samples ({len(val_indices)/len(y)*100:.1f}%)")
-    print(f"   Test: {len(test_indices)} samples ({len(test_indices)/len(y)*100:.1f}%)")
+    def get_test_from_csv(self, csv_path, text_column='text', target='label'):
+        """Get test data from CSV file using saved indices (use only for final evaluation!)"""
+        self._check_splits_exist()
+        df = pd.read_csv(csv_path)
+        return (df[text_column].iloc[self.test_indices].reset_index(drop=True),
+                df[target].iloc[self.test_indices].reset_index(drop=True))
     
-    # Save splits for consistency across pipeline phases
-    if save_splits:
+    def get_train_val_from_csv(self, csv_path, text_column='text', target='label'):
+        """Get combined train+validation data from CSV file using saved indices"""
+        self._check_splits_exist()
+        df = pd.read_csv(csv_path)
+        combined_indices = sorted(self.train_indices + self.val_indices)
+        return (df[text_column].iloc[combined_indices].reset_index(drop=True),
+                df[target].iloc[combined_indices].reset_index(drop=True))
+    
+    def _check_splits_exist(self):
+        """Check if splits have been created"""
+        if self.train_indices is None:
+            raise ValueError("Splits not created. Call create_splits() first.")
+    
+    def _save_splits(self):
+        """Save split indices to disk for consistency"""
         os.makedirs("data/processed/splits", exist_ok=True)
-        with open("data/processed/splits/data_splits.pkl", 'wb') as f:
-            pickle.dump(splits, f)
-        print("Data splits saved to data/processed/splits/data_splits.pkl")
+        
+        split_data = {
+            'train_indices': self.train_indices,
+            'val_indices': self.val_indices,
+            'test_indices': self.test_indices,
+            'train_size': self.train_size,
+            'val_size': self.val_size,
+            'test_size': self.test_size,
+            'random_state': self.random_state
+        }
+        
+        with open("data/processed/splits/split_indices.pkl", 'wb') as f:
+            pickle.dump(split_data, f)
+        print("Split indices saved to data/processed/splits/split_indices.pkl")
     
-    return splits
-
-def load_data_splits():
-    """Load previously saved data splits"""
-    splits_file = "data/processed/splits/data_splits.pkl"
-    
-    if os.path.exists(splits_file):
+    @classmethod
+    def load_splits(cls):
+        """Load previously saved split indices"""
+        splits_file = "data/processed/splits/split_indices.pkl"
+        
+        if not os.path.exists(splits_file):
+            print("No saved split indices found")
+            return None
+        
         with open(splits_file, 'rb') as f:
-            splits = pickle.load(f)
+            split_data = pickle.load(f)
         
-        info = splits['split_info']
-        print("Loaded consistent data splits:")
-        print(f"   Train: {info['train_size']} samples")
-        print(f"   Validation: {info['val_size']} samples") 
-        print(f"   Test: {info['test_size']} samples")
+        # Create instance with saved parameters
+        splitter = cls(
+            train_size=split_data['train_size'],
+            val_size=split_data['val_size'], 
+            test_size=split_data['test_size'],
+            random_state=split_data['random_state']
+        )
         
-        return splits
-    else:
-        print("No saved data splits found")
-        return None
-
-def get_train_data(splits, dataset='minimal'):
-    """Get training data for a specific dataset"""
-    return splits[dataset]['train_text'], splits[dataset]['train_labels']
-
-def get_val_data(splits, dataset='minimal'):
-    """Get validation data for a specific dataset"""
-    return splits[dataset]['val_text'], splits[dataset]['val_labels']
-
-def get_test_data(splits, dataset='minimal'):
-    """Get test data for a specific dataset (use only for final evaluation!)"""
-    return splits[dataset]['test_text'], splits[dataset]['test_labels']
-
-def get_train_val_data(splits, dataset='minimal'):
-    """Get combined train+validation data (for model selection with cross-validation)"""
-    train_text = splits[dataset]['train_text']
-    val_text = splits[dataset]['val_text']
-    train_labels = splits[dataset]['train_labels']
-    val_labels = splits[dataset]['val_labels']
-    
-    # Combine train and validation
-    combined_text = pd.concat([train_text, val_text], ignore_index=True)
-    combined_labels = pd.concat([train_labels, val_labels], ignore_index=True)
-    
-    return combined_text, combined_labels
+        # Load the indices
+        splitter.train_indices = split_data['train_indices']
+        splitter.val_indices = split_data['val_indices']
+        splitter.test_indices = split_data['test_indices']
+        
+        print("Loaded split indices:")
+        print(f"   Train: {len(splitter.train_indices)} samples")
+        print(f"   Validation: {len(splitter.val_indices)} samples")
+        print(f"   Test: {len(splitter.test_indices)} samples")
+        
+        return splitter

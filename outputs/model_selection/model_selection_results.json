@@ -1,72 +1,82 @@
-{
-  "XGBoost_minimal": {
-    "model_name": "XGBoost",
+[
+  {
     "dataset": "minimal",
-    "cv_f1_mean": 0.9048710812394184,
-    "cv_f1_std": 0.012653459743276745,
-    "report_file": "outputs/model_selection/XGBoost_minimal_report.txt"
+    "model": "XGBoost",
+    "cv_f1_mean": 0.8684334173386823,
+    "cv_f1_std": 0.05622696848834287,
+    "val_f1_score": 0.8841042925381231,
+    "rank": 1
   },
-  "Random Forest_minimal": {
-    "model_name": "Random Forest",
+  {
     "dataset": "minimal",
-    "cv_f1_mean": 0.8937929963642377,
-    "cv_f1_std": 0.014601085392553613,
-    "report_file": "outputs/model_selection/Random Forest_minimal_report.txt"
+    "model": "SVM",
+    "cv_f1_mean": 0.8587944700935056,
+    "cv_f1_std": 0.06282294002979978,
+    "val_f1_score": 0.8970646892705926,
+    "rank": 2
   },
-  "Logistic Regression_minimal": {
-    "model_name": "Logistic Regression",
+  {
     "dataset": "minimal",
-    "cv_f1_mean": 0.8736730663796853,
-    "cv_f1_std": 0.01227304896334001,
-    "report_file": "outputs/model_selection/Logistic Regression_minimal_report.txt"
+    "model": "Random Forest",
+    "cv_f1_mean": 0.8498837597898042,
+    "cv_f1_std": 0.07542608630295047,
+    "val_f1_score": 0.887716016933221,
+    "rank": 3
   },
-  "SVM_minimal": {
-    "model_name": "SVM",
+  {
     "dataset": "minimal",
-    "cv_f1_mean": 0.8876881058235979,
-    "cv_f1_std": 0.012985272088950155,
-    "report_file": "outputs/model_selection/SVM_minimal_report.txt"
+    "model": "Naive Bayes",
+    "cv_f1_mean": 0.8457417630556296,
+    "cv_f1_std": 0.06024372111828387,
+    "val_f1_score": 0.8651587814374663,
+    "rank": 4
   },
-  "Naive Bayes_minimal": {
-    "model_name": "Naive Bayes",
+  {
     "dataset": "minimal",
-    "cv_f1_mean": 0.8706807887716318,
-    "cv_f1_std": 0.011766438800353876,
-    "report_file": "outputs/model_selection/Naive Bayes_minimal_report.txt"
+    "model": "Logistic Regression",
+    "cv_f1_mean": 0.8334891408641069,
+    "cv_f1_std": 0.07020792653681153,
+    "val_f1_score": 0.8693347422181129,
+    "rank": 5
   },
-  "XGBoost_aggressive": {
-    "model_name": "XGBoost",
+  {
     "dataset": "aggressive",
-    "cv_f1_mean": 0.906053867439439,
-    "cv_f1_std": 0.014978417823060971,
-    "report_file": "outputs/model_selection/XGBoost_aggressive_report.txt"
+    "model": "XGBoost",
+    "cv_f1_mean": 0.8697471558348928,
+    "cv_f1_std": 0.06409682433898214,
+    "val_f1_score": 0.8929550718573527,
+    "rank": 1
   },
-  "Random Forest_aggressive": {
-    "model_name": "Random Forest",
+  {
     "dataset": "aggressive",
-    "cv_f1_mean": 0.8908133124820111,
-    "cv_f1_std": 0.013484176109072304,
-    "report_file": "outputs/model_selection/Random Forest_aggressive_report.txt"
+    "model": "SVM",
+    "cv_f1_mean": 0.8593887738553564,
+    "cv_f1_std": 0.06549044485814777,
+    "val_f1_score": 0.8923857019367175,
+    "rank": 2
   },
-  "Logistic Regression_aggressive": {
-    "model_name": "Logistic Regression",
+  {
     "dataset": "aggressive",
-    "cv_f1_mean": 0.8703449712403655,
-    "cv_f1_std": 0.01237230730533005,
-    "report_file": "outputs/model_selection/Logistic Regression_aggressive_report.txt"
+    "model": "Random Forest",
+    "cv_f1_mean": 0.8536297102606625,
+    "cv_f1_std": 0.07153087473184755,
+    "val_f1_score": 0.8930411710789384,
+    "rank": 3
   },
-  "SVM_aggressive": {
-    "model_name": "SVM",
+  {
     "dataset": "aggressive",
-    "cv_f1_mean": 0.8824908263519768,
-    "cv_f1_std": 0.013018699002946029,
-    "report_file": "outputs/model_selection/SVM_aggressive_report.txt"
+    "model": "Naive Bayes",
+    "cv_f1_mean": 0.8450280423871931,
+    "cv_f1_std": 0.05971065988366745,
+    "val_f1_score": 0.861658170353719,
+    "rank": 4
   },
-  "Naive Bayes_aggressive": {
-    "model_name": "Naive Bayes",
+  {
     "dataset": "aggressive",
-    "cv_f1_mean": 0.8686087359513426,
-    "cv_f1_std": 0.01179162957412062,
-    "report_file": "outputs/model_selection/Naive Bayes_aggressive_report.txt"
+    "model": "Logistic Regression",
+    "cv_f1_mean": 0.8325214019769642,
+    "cv_f1_std": 0.07439114219218908,
+    "val_f1_score": 0.8662145926951828,
+    "rank": 5
   }
-}
+]

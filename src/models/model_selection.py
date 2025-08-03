@@ -1,353 +1,261 @@
-"""Model selection with clean output and consistent evaluation"""
-
 import os
 import json
-from sklearn.model_selection import cross_val_score, train_test_split
+import pickle
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.metrics import classification_report, accuracy_score, f1_score, precision_score, recall_score
+from sklearn.metrics import classification_report, f1_score
+from sklearn.model_selection import cross_val_score
+from sklearn.pipeline import Pipeline
 import xgboost as xgb
-import pandas as pd
 
-from src.config.settings import CV_FOLDS, RANDOM_STATE, TEST_SIZE
+from src.config.settings import RANDOM_STATE
+from src.config.settings import TFIDF_MAX_FEATURES, TFIDF_MIN_DF, TFIDF_MAX_DF
+from src.utils.data_splits import DataSplitter
 
-def save_model_selection_results(results, output_dir="outputs/model_selection"):
-    """Save model selection results to file"""
-    import pickle
+def _validate_inputs(splitter, dataset_names):
+    """Validate inputs for model selection"""
+    if splitter.train_indices is None:
+        raise ValueError("DataSplitter has no splits. Call create_splits() first.")
     
-    os.makedirs(output_dir, exist_ok=True)
-    results_file = f"{output_dir}/model_selection_results.json"
-    
-    # Convert results to JSON-serializable format
-    json_results = {}
-    for key, result in results.items():
-        json_results[key] = {
-            'model_name': result['model_name'],
-            'dataset': result['dataset'],
-            'cv_f1_mean': float(result['cv_f1_mean']),
-            'cv_f1_std': float(result['cv_f1_std']),
-            'report_file': result.get('report_file', '')
-        }
-        
-        # Save vectorizer as pickle file for hyperparameter tuning
-        if 'vectorizer' in result:
-            vectorizer_file = f"{output_dir}/{key}_vectorizer.pkl"
-            with open(vectorizer_file, 'wb') as f:
-                pickle.dump(result['vectorizer'], f)
-            print(f"  Saved vectorizer: {vectorizer_file}")
-    
-    with open(results_file, 'w') as f:
-        json.dump(json_results, f, indent=2)
-    
-    print(f"Model selection results saved to {results_file}")
-    return results_file
+    valid_datasets = ['minimal', 'aggressive']
+    invalid_datasets = [name for name in dataset_names if name not in valid_datasets]
+    if invalid_datasets:
+        raise ValueError(f"Invalid dataset names: {invalid_datasets}. Valid options: {valid_datasets}")
 
-def load_model_selection_results(output_dir="outputs/model_selection"):
-    """Load previously saved model selection results"""
-    results_file = f"{output_dir}/model_selection_results.json"
-    
-    if os.path.exists(results_file):
-        with open(results_file, 'r') as f:
-            return json.load(f)
-    return None
-
-def compare_models_on_datasets(splits, dataset_names=['minimal', 'aggressive']):
-    """
-    Compare models on both minimal and aggressive datasets using proper train/validation splits.
-    
-    ML Best Practices:
-    1. Uses only train+validation data (test set is held out)
-    2. Fits TF-IDF only on training data
-    3. Uses cross-validation on train+validation combined
-    4. Saves fitted vectorizers for consistent use in later phases
-    
-    Args:
-        splits: Data splits from create_data_splits()
-        dataset_names: List of dataset names to compare
-    
-    Returns:
-        dict: Results for each model-dataset combination
-    """
-    
-    from src.config.settings import TFIDF_MAX_FEATURES, TFIDF_MIN_DF, TFIDF_MAX_DF
-    from src.utils.data_splits import get_train_data, get_train_val_data
-    
-    # Simple parameters for model selection phase
-    models = {
+def _define_models():
+    """Define models for quick screening phase (class imbalance handled in hyperparameter tuning)"""
+    return {
         'XGBoost': xgb.XGBClassifier(
-            n_estimators=100,
+            n_estimators=100, 
             random_state=RANDOM_STATE
         ),
         'Random Forest': RandomForestClassifier(
-            n_estimators=100,
+            n_estimators=100, 
             random_state=RANDOM_STATE
         ),
         'Logistic Regression': LogisticRegression(
-            random_state=RANDOM_STATE, 
-            max_iter=500
+            max_iter=1000, 
+            random_state=RANDOM_STATE
         ),
         'SVM': SVC(
+            kernel='linear', 
             random_state=RANDOM_STATE
         ),
         'Naive Bayes': MultinomialNB()
     }
-    
-    print("=" * 60)
-    print("MODEL SELECTION")
-    print("=" * 60)
-    print("Strategy: Cross-validation on train+validation data only")
-    print("Test set is held out for final evaluation")
-    print()
-    
-    all_results = {}
-    
-    for dataset_name in dataset_names:
-        print(f"Dataset: {dataset_name}")
-        print("-" * 40)
-        
-        # Get train data for TF-IDF fitting
-        train_text, train_labels = get_train_data(splits, dataset_name)
-        
-        # Get train+validation data for cross-validation
-        train_val_text, train_val_labels = get_train_val_data(splits, dataset_name)
-        
-        print(f"Train data for TF-IDF fitting: {len(train_text)} samples")
-        print(f"Train+Val data for CV: {len(train_val_text)} samples")
-        
-        # Create TF-IDF vectorizer and fit ONLY on training data
-        vectorizer = TfidfVectorizer(
+
+def _create_tfidf_pipeline(model):
+    """Create TF-IDF pipeline for a model"""
+    return Pipeline([
+        ('tfidf', TfidfVectorizer(
             max_features=TFIDF_MAX_FEATURES,
             min_df=TFIDF_MIN_DF,
             max_df=TFIDF_MAX_DF,
-            stop_words=None  # We handle Arabic stopwords in preprocessing
-        )
+            stop_words=None
+        )),
+        ('classifier', model)
+    ])
+
+def _print_ascii_table(results, title):
+    """Print results in professional ASCII table format"""
+    print(f"\n{title}")
+    print("=" * 80)
+    print(f"{'Model':<20} {'CV F1 Mean':<12} {'CV F1 Std':<12} {'Val F1':<12} {'Rank':<8}")
+    print("-" * 80)
+    
+    for result in results:
+        print(f"{result['model']:<20} {result['cv_f1_mean']:<12.4f} {result['cv_f1_std']:<12.4f} "
+              f"{result['val_f1_score']:<12.4f} {result['rank']:<8}")
+    print("-" * 80)
+
+def _perform_cross_validation(X_train, y_train, model_name, pipeline):
+    """Perform 5-fold cross-validation on training data"""
+    cv_scores = cross_val_score(
+        pipeline, X_train, y_train, 
+        cv=5, scoring='f1_weighted', 
+        n_jobs=-1
+    )
+    
+    cv_f1_mean = cv_scores.mean()
+    cv_f1_std = cv_scores.std()
+    
+    print(f"{model_name:<20} CV F1: {cv_f1_mean:.4f} (+/- {cv_f1_std:.4f})")
+    
+    return cv_f1_mean, cv_f1_std
+
+def _evaluate_on_validation(pipeline, X_train, y_train, X_val, y_val, model_name):
+    """Train on training data and evaluate on validation data"""
+    pipeline.fit(X_train, y_train)
+    y_pred = pipeline.predict(X_val)
+    val_f1 = f1_score(y_val, y_pred, average='weighted')
+    
+    print(f"{model_name:<20} Val F1: {val_f1:.4f}")
+    
+    return val_f1
+
+def compare_models(splitter, dataset_names, output_dir):
+    """
+    Compare models using 5-fold cross-validation on training data + validation evaluation.
+    
+    Methodology:
+    1. Use 5-fold CV on training data (2,712 samples) for robust model comparison
+    2. Train final models on full training data and evaluate on validation data (904 samples)
+    3. Rank models by CV F1 score for hyperparameter tuning selection
+    4. Maintain 60/20/20 split integrity throughout process
+    """
+    _validate_inputs(splitter, dataset_names)
+    
+    print("\nMODEL SELECTION WITH CROSS-VALIDATION")
+    print("=" * 60)
+    print("Methodology: 5-fold CV on training data + validation evaluation")
+    print(f"Training samples: {len(splitter.train_indices)}")
+    print(f"Validation samples: {len(splitter.val_indices)}")
+    print(f"Test samples: {len(splitter.test_indices)} (held out)")
+    
+    all_results = []
+    models = _define_models()
+    
+    for dataset_name in dataset_names:
+        print(f"\n\nDATASET: {dataset_name.upper()}")
+        print("=" * 40)
         
-        # Fit vectorizer ONLY on training text (proper ML practice)
-        print("Fitting TF-IDF vectorizer on training data only...")
-        vectorizer.fit(train_text.fillna(''))
+        # Load data using data splitter methods
+        data_path = f'data/processed/{dataset_name}_cleaned.csv'
+        if not os.path.exists(data_path):
+            print(f"Skipping {dataset_name}: file not found")
+            continue
+        
+        # Use data splitter methods to get train and validation data
+        X_train, y_train = splitter.get_train_from_csv(data_path)
+        X_val, y_val = splitter.get_val_from_csv(data_path)
+        
+        dataset_results = []
+        
+        print(f"\nPerforming 5-fold cross-validation on training data...")
+        print("-" * 60)
         
         for model_name, model in models.items():
-            try:
-                # For cross-validation, we need to create a pipeline to ensure proper fitting
-                from sklearn.pipeline import Pipeline
-                
-                # Create a fresh vectorizer for the pipeline (will be fitted during CV)
-                cv_vectorizer = TfidfVectorizer(
-                    max_features=TFIDF_MAX_FEATURES,
-                    min_df=TFIDF_MIN_DF,
-                    max_df=TFIDF_MAX_DF,
-                    stop_words=None
-                )
-                
-                cv_pipeline = Pipeline([
-                    ('tfidf', cv_vectorizer),
-                    ('classifier', model)
-                ])
-                
-                # Cross-validation with proper pipeline (prevents data leakage)
-                cv_scores = cross_val_score(
-                    cv_pipeline, 
-                    train_val_text.fillna(''), 
-                    train_val_labels, 
-                    cv=CV_FOLDS, 
-                    scoring='f1_weighted'
-                )
-                cv_f1_mean = cv_scores.mean()
-                cv_f1_std = cv_scores.std()
-                
-                # Train final model for classification report (using the fitted vectorizer)
-                X_train = vectorizer.transform(train_text.fillna(''))
-                model.fit(X_train, train_labels)
-                
-                # Create a small validation split for classification report
-                from sklearn.model_selection import train_test_split
-                X_train_split, X_val_split, y_train_split, y_val_split = train_test_split(
-                    X_train, train_labels, test_size=0.25, random_state=RANDOM_STATE, stratify=train_labels
-                )
-                
-                # Retrain on the smaller training split
-                model.fit(X_train_split, y_train_split)
-                y_pred = model.predict(X_val_split)
-                
-                # Generate classification report as text
-                class_report_text = classification_report(y_val_split, y_pred, digits=4)
-                
-                # Save classification report as .txt file
-                os.makedirs("outputs/model_selection", exist_ok=True)
-                report_filename = f"outputs/model_selection/{model_name}_{dataset_name}_report.txt"
-                
-                with open(report_filename, 'w') as f:
-                    f.write(f"Model: {model_name}\n")
-                    f.write(f"Dataset: {dataset_name}\n")
-                    f.write(f"Cross-Validation F1 (5-fold): {cv_f1_mean:.4f} (+/- {cv_f1_std*2:.4f})\n")
-                    f.write("=" * 60 + "\n")
-                    f.write("CLASSIFICATION REPORT (Train/Val Split within Training Data):\n")
-                    f.write("=" * 60 + "\n")
-                    f.write(class_report_text)
-                    f.write("\n" + "=" * 60 + "\n")
-                    f.write(f"Note: CV F1 score ({cv_f1_mean:.4f}) is used for model comparison\n")
-                    f.write("Note: Test set is held out and not used in model selection\n")
-                
-                result_key = f"{model_name}_{dataset_name}"
-                all_results[result_key] = {
-                    'model_name': model_name,
-                    'dataset': dataset_name,
-                    'cv_f1_mean': cv_f1_mean,
-                    'cv_f1_std': cv_f1_std,
-                    'model': model,
-                    'vectorizer': vectorizer,  # Save the fitted vectorizer
-                    'report_file': report_filename
-                }
-                
-                print(f"  {model_name:<20} CV F1: {cv_f1_mean:.4f} (+/- {cv_f1_std*2:.4f})")
-                
-            except Exception as e:
-                print(f"  {model_name:<20} FAILED: {str(e)}")
-                continue
+            pipeline = _create_tfidf_pipeline(model)
+            
+            # Perform cross-validation on training data only
+            cv_f1_mean, cv_f1_std = _perform_cross_validation(
+                X_train, y_train, model_name, pipeline
+            )
+            
+            # Evaluate on validation data
+            val_f1 = _evaluate_on_validation(
+                pipeline, X_train, y_train, X_val, y_val, model_name
+            )
+            
+            result = {
+                'dataset': dataset_name,
+                'model': model_name,
+                'cv_f1_mean': cv_f1_mean,
+                'cv_f1_std': cv_f1_std,
+                'val_f1_score': val_f1,
+                'pipeline': pipeline  # Store for saving best model
+            }
+            
+            dataset_results.append(result)
         
-        print()
+        # Rank models by CV F1 score (primary metric for model selection)
+        dataset_results.sort(key=lambda x: x['cv_f1_mean'], reverse=True)
+        for i, result in enumerate(dataset_results, 1):
+            result['rank'] = i
+        
+        # Print results table
+        _print_ascii_table(dataset_results, f"RESULTS SUMMARY - {dataset_name.upper()}")
+        
+        # Save best model pipeline
+        best_result = dataset_results[0]
+        best_pipeline_path = os.path.join(output_dir, f'best_pipeline_{dataset_name}.pkl')
+        with open(best_pipeline_path, 'wb') as f:
+            pickle.dump(best_result['pipeline'], f)
+        print(f"\nBest model saved: {best_result['model']} (CV F1: {best_result['cv_f1_mean']:.4f})")
+        
+        # Generate classification report for best model
+        best_pipeline = best_result['pipeline']
+        y_pred = best_pipeline.predict(X_val)
+        report = classification_report(y_val, y_pred, output_dict=True)
+        
+        # Save detailed results
+        report_path = os.path.join(output_dir, f'{best_result["model"]}_{dataset_name}_report.txt')
+        with open(report_path, 'w') as f:
+            f.write(f"Model: {best_result['model']}\n")
+            f.write(f"Dataset: {dataset_name}\n")
+            f.write(f"CV F1 Mean: {best_result['cv_f1_mean']:.4f}\n")
+            f.write(f"CV F1 Std: {best_result['cv_f1_std']:.4f}\n")
+            f.write(f"Validation F1: {best_result['val_f1_score']:.4f}\n\n")
+            f.write("Classification Report:\n")
+            f.write(classification_report(y_val, y_pred))
+        
+        all_results.extend(dataset_results)
     
-    # Find best 2 models overall (Option A)
-    sorted_results = sorted(all_results.items(), key=lambda x: x[1]['cv_f1_mean'], reverse=True)
+    # Save comprehensive results
+    results_path = os.path.join(output_dir, 'model_selection_results.json')
+    serializable_results = []
+    for result in all_results:
+        serializable_result = {k: v for k, v in result.items() if k != 'pipeline'}
+        serializable_results.append(serializable_result)
     
-    print("=" * 60)
-    print("MODEL RANKING (by Cross-Validation F1 Score)")
-    print("=" * 60)
-    for i, (key, result) in enumerate(sorted_results):
-        print(f"{i+1:2d}. {result['model_name']:<20} ({result['dataset']:<10}) F1: {result['cv_f1_mean']:.4f}")
+    with open(results_path, 'w') as f:
+        json.dump(serializable_results, f, indent=2)
     
-    best_2 = sorted_results[:2]
-    print()
-    print("SELECTED FOR HYPERPARAMETER TUNING:")
-    for i, (key, result) in enumerate(best_2):
-        print(f"  {i+1}. {result['model_name']} on {result['dataset']} dataset (F1: {result['cv_f1_mean']:.4f})")
-    
-    print("=" * 60)
-    
-    # Save results
-    save_model_selection_results(all_results)
+    print(f"\n\nMODEL SELECTION COMPLETE")
+    print("=" * 40)
+    print(f"Results saved to: {output_dir}")
+    print("Next step: Hyperparameter tuning on best models")
     
     return all_results
 
-def compare_models(X, y):
-    """Backward compatibility function for old imports"""
-    # Simple model comparison for backwards compatibility
-    models = {
-        'XGBoost': xgb.XGBClassifier(n_estimators=100, random_state=RANDOM_STATE),
-        'Random Forest': RandomForestClassifier(n_estimators=100, random_state=RANDOM_STATE),
-        'Logistic Regression': LogisticRegression(random_state=RANDOM_STATE, max_iter=500),
-        'SVM': SVC(random_state=RANDOM_STATE),
-        'Naive Bayes': MultinomialNB()
-    }
-    
-    results = {}
-    for name, model in models.items():
-        try:
-            cv_scores = cross_val_score(model, X, y, cv=CV_FOLDS, scoring='f1_weighted')
-            results[name] = {
-                'mean_f1': cv_scores.mean(),
-                'std_f1': cv_scores.std(),
-                'model': model
-            }
-        except:
-            continue
-    
-    # Save results for future use
-    save_model_selection_results(results)
-    
-    return results
+# Legacy compatibility functions (maintained for backward compatibility)
+def compare_models_on_datasets(splitter, dataset_names=['minimal', 'aggressive']):
+    """Legacy wrapper - redirects to new compare_models function"""
+    return compare_models(splitter, dataset_names, "outputs/model_selection")
 
-def evaluate_best_model(results, X, y):
-    """Evaluate the best model with train/val/test split"""
-    
-    # Find best model by F1 score
-    best_name = max(results.keys(), key=lambda k: results[k]['mean_f1'])
-    best_model = results[best_name]['model']
-    
-    print(f"Best model: {best_name}")
-    
-    # Train/val/test split
-    X_temp, X_test, y_temp, y_test = train_test_split(
-        X, y, test_size=TEST_SIZE, random_state=RANDOM_STATE, stratify=y
-    )
-    X_train, X_val, y_train, y_val = train_test_split(
-        X_temp, y_temp, test_size=0.25, 
-        random_state=RANDOM_STATE, stratify=y_temp
-    )
-    
-    print(f"Train: {X_train.shape[0]}, Val: {X_val.shape[0]}, Test: {X_test.shape[0]} samples")
-    
-    # Train on training set
-    best_model.fit(X_train, y_train)
-    
-    # Evaluate on test set
-    y_pred = best_model.predict(X_test)
-    
-    # Calculate metrics
-    accuracy = accuracy_score(y_test, y_pred)
-    f1 = f1_score(y_test, y_pred, average='weighted')
-    precision = precision_score(y_test, y_pred, average='weighted')
-    recall = recall_score(y_test, y_pred, average='weighted')
-    
-    print(f"Results: Accuracy={accuracy:.4f}, F1={f1:.4f}, Precision={precision:.4f}, Recall={recall:.4f}")
-    
-    return best_model, {
-        'name': best_name,
-        'accuracy': accuracy,
-        'f1_score': f1,
-        'precision': precision,
-        'recall': recall
-    }
+def get_best_model():
+    """Get the best model from model selection results"""
+    try:
+        results_path = "outputs/model_selection/model_selection_results.json"
+        if not os.path.exists(results_path):
+            return None
+        
+        with open(results_path, 'r') as f:
+            results = json.load(f)
+        
+        # Find best model by CV F1 score
+        best_result = max(results, key=lambda x: x['cv_f1_mean'])
+        
+        return {
+            'model_name': best_result['model'],
+            'dataset': best_result['dataset'],
+            'cv_f1_mean': best_result['cv_f1_mean'],
+            'val_f1_score': best_result['val_f1_score']
+        }
+    except Exception as e:
+        print(f"Failed to get best model: {str(e)}")
+        return None
 
-def get_vectorizers_from_model_selection():
-    """Get fitted vectorizers from model selection results"""
-    import pickle
-    
-    results = load_model_selection_results()
-    if not results:
+def load_best_pipeline():
+    """Load the best trained pipeline for hyperparameter tuning"""
+    best_model = get_best_model()
+    if not best_model:
+        print("No best model found")
         return None
     
-    vectorizers = {}
-    # The saved results only have JSON-serializable data
-    # We need to load vectorizers separately from their pickle files
-    for key, result in results.items():
-        vectorizer_file = f"outputs/model_selection/{key}_vectorizer.pkl"
-        if os.path.exists(vectorizer_file):
-            with open(vectorizer_file, 'rb') as f:
-                vectorizers[key] = pickle.load(f)
+    pipeline_file = f"outputs/model_selection/best_pipeline_{best_model['dataset']}.pkl"
     
-    return vectorizers
-
-def get_best_models_with_vectorizers():
-    """Get the best 2 models with their corresponding vectorizers"""
-    import pickle
-    
-    # Load model selection results
-    results = load_model_selection_results()
-    if not results:
-        return None, None
-    
-    # Sort by F1 score
-    sorted_results = sorted(results.items(), key=lambda x: x[1]['cv_f1_mean'], reverse=True)
-    best_2 = sorted_results[:2]
-    
-    models = {}
-    vectorizers = {}
-    
-    for key, result in best_2:
-        # Load model
-        model_file = f"outputs/model_selection/{key}_model.pkl"
-        if os.path.exists(model_file):
-            with open(model_file, 'rb') as f:
-                models[key] = pickle.load(f)
-        
-        # Load vectorizer  
-        vectorizer_file = f"outputs/model_selection/{key}_vectorizer.pkl"
-        if os.path.exists(vectorizer_file):
-            with open(vectorizer_file, 'rb') as f:
-                vectorizers[key] = pickle.load(f)
-    
-    return models, vectorizers
+    try:
+        if os.path.exists(pipeline_file):
+            with open(pipeline_file, 'rb') as f:
+                pipeline = pickle.load(f)
+            return pipeline, best_model
+        else:
+            print(f"Best pipeline file not found: {pipeline_file}")
+            return None
+    except Exception as e:
+        print(f"Failed to load pipeline: {str(e)}")
+        return None

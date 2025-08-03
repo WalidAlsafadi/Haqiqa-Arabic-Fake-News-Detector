@@ -2,481 +2,326 @@
 """
 Palestine Fake News Detection - Main Entry Point
 
-Simple, clean interface for the entire ML pipeline.
+Clean, professional interface for the entire ML pipeline.
+Uses the cleaned and refactored modules for optimal performance.
 """
 
 import argparse
 import sys
+import os
 from pathlib import Path
 
+
+def _show_config():
+    """Display current configuration settings"""
+    from src.config.settings import (
+        DATASET_PATH, RANDOM_STATE, CV_FOLDS, 
+        TFIDF_MAX_FEATURES, TFIDF_MIN_DF, TFIDF_MAX_DF
+    )
+    
+    print("CURRENT CONFIGURATION")
+    print("-" * 30)
+    print(f"Dataset Path: {DATASET_PATH}")
+    print(f"Random State: {RANDOM_STATE}")
+    print(f"CV Folds: {CV_FOLDS}")
+    print(f"TF-IDF Max Features: {TFIDF_MAX_FEATURES}")
+    print(f"TF-IDF Min DF: {TFIDF_MIN_DF}")
+    print(f"TF-IDF Max DF: {TFIDF_MAX_DF}")
+
+
+def _show_pipeline_info():
+    """Display pipeline overview and structure"""
+    print("PIPELINE OVERVIEW")
+    print("-" * 30)
+    print("1. Data Preparation:")
+    print("   - Load raw dataset")
+    print("   - Apply 3 text cleaning approaches (minimal, aggressive, transformers)")
+    print("   - Create consistent train/validation/test splits (60/20/20)")
+    print("   - Save 3 separate CSV files for flexibility:")
+    print("     • minimal_cleaned.csv (traditional ML)")
+    print("     • aggressive_cleaned.csv (robust ML)")
+    print("     • transformers_cleaned.csv (AraBERT fine-tuning)")
+    print()
+    print("2. Model Selection:")
+    print("   - Compare 5 models (XGBoost, Random Forest, Logistic Regression, SVM, Naive Bayes)")
+    print("   - Use 5-fold cross-validation on training data for robust comparison")
+    print("   - Evaluate models on validation data")
+    print("   - Test minimal & aggressive datasets")
+    print("   - Test set remains untouched")
+    print()
+    print("3. Hyperparameter Tuning:")
+    print("   - Tune best performing model using validation set")
+    print("   - Use GridSearchCV with proper parameter grids")
+    print("   - Train final model on train+validation combined")
+    print()
+    print("4. Final Evaluation:")
+    print("   - Evaluate tuned model on held-out test set")
+    print("   - Generate comprehensive reports and visualizations")
+    print()
+    print("5. AraBERT Fine-tuning (Optional):")
+    print("   - Use transformers_cleaned.csv independently")
+    print("   - Compatible with Hugging Face workflows")
+
+
+def _run_data_preparation():
+    """Run data preparation phase"""
+    from src.preprocessing.text_cleaner import prepare_data
+    from src.config.settings import DATASET_PATH
+    from src.utils.data_splits import DataSplitter
+    
+    print("\nSTARTING DATA PREPARATION")
+    print("=" * 50)
+    
+    # Load and clean data
+    print(f"Loading dataset from: {DATASET_PATH}")
+    df = prepare_data(DATASET_PATH)
+    print(f"Data prepared: {len(df)} samples")
+    
+    # Create data splits (for consistent indices across all datasets)
+    print("Creating train/validation/test splits (60/20/20)")
+    splitter = DataSplitter()
+    splitter.create_splits(df)
+    
+    # Save separate CSV files for flexibility and framework compatibility
+    print("Saving separate datasets for different approaches")
+    os.makedirs("data/processed", exist_ok=True)
+    
+    # 1. Minimal cleaning - for quick traditional ML experiments
+    minimal_df = df[['text_minimal', 'label']].copy()
+    minimal_df = minimal_df.rename(columns={'text_minimal': 'text'})
+    minimal_df.to_csv("data/processed/minimal_cleaned.csv", index=False)
+    print(f"  - Minimal dataset: {len(minimal_df)} samples → data/processed/minimal_cleaned.csv")
+    
+    # 2. Aggressive cleaning - for robust traditional ML
+    aggressive_df = df[['text_aggressive', 'label']].copy()
+    aggressive_df = aggressive_df.rename(columns={'text_aggressive': 'text'})
+    aggressive_df.to_csv("data/processed/aggressive_cleaned.csv", index=False)
+    print(f"  - Aggressive dataset: {len(aggressive_df)} samples → data/processed/aggressive_cleaned.csv")
+    
+    # 3. Transformers ready - for AraBERT fine-tuning
+    transformers_df = df[['text_transformers', 'label']].copy()
+    transformers_df = transformers_df.rename(columns={'text_transformers': 'text'})
+    transformers_df.to_csv("data/processed/transformers_cleaned.csv", index=False)
+    print(f"  - Transformers dataset: {len(transformers_df)} samples → data/processed/transformers_cleaned.csv")
+    
+    print("Data preparation completed successfully")
+    print("All datasets use consistent train/val/test splits via saved indices")
+    return df, splitter
+
+
+def _run_model_selection(splitter):
+    """Run model selection phase with cross-validation"""
+    from src.models.model_selection import compare_models
+    
+    print("\nSTARTING MODEL SELECTION")
+    print("=" * 50)
+    
+    # Create output directory
+    os.makedirs("outputs/model_selection", exist_ok=True)
+    
+    # Compare models using cross-validation
+    results = compare_models(splitter, dataset_names=['minimal', 'aggressive'], 
+                           output_dir="outputs/model_selection")
+    
+    if not results:
+        print("Model selection failed")
+        return None
+    
+    print("Model selection completed successfully")
+    return results
+
+
+def _run_hyperparameter_tuning(splitter):
+    """Run hyperparameter tuning phase"""
+    from src.models.hyperparameter_tuning import tune_best_model
+    
+    print("\nSTARTING HYPERPARAMETER TUNING")
+    print("=" * 50)
+    
+    # Tune the best model
+    result = tune_best_model(splitter)
+    
+    if not result:
+        print("Hyperparameter tuning failed")
+        return None
+    
+    print("Hyperparameter tuning completed successfully")
+    return result
+    return result
+
+
+def _run_final_evaluation(splitter):
+    """Run final evaluation phase"""
+    from src.models.model_evaluation import evaluate_final_model
+    
+    print("\nSTARTING FINAL EVALUATION")
+    print("=" * 50)
+    
+    # Evaluate on test set
+    results = evaluate_final_model(splitter)
+    
+    if not results:
+        print("Final evaluation failed")
+        return None
+    
+    # Display key results
+    print("Final Test Results:")
+    print(f"  Accuracy: {results['test_accuracy']:.4f}")
+    print(f"  F1 (weighted): {results['test_f1_weighted']:.4f}")
+    print(f"  Fake News F1: {results['fake_news_f1']:.4f}")
+    print(f"  Real News F1: {results['real_news_f1']:.4f}")
+    
+    print("Final evaluation completed successfully")
+    return results
+
+
+def _run_complete_pipeline():
+    """Run the complete ML pipeline"""
+    print("PALESTINE FAKE NEWS DETECTION PIPELINE")
+    print("=" * 60)
+    
+    try:
+        # Phase 1: Data Preparation
+        df, splitter = _run_data_preparation()
+        
+        # Phase 2: Model Selection
+        model_results = _run_model_selection(splitter)
+        if not model_results:
+            return False
+        
+        # Phase 3: Hyperparameter Tuning
+        tuning_result = _run_hyperparameter_tuning(splitter)
+        if not tuning_result:
+            return False
+        
+        # Phase 4: Final Evaluation
+        final_results = _run_final_evaluation(splitter)
+        if not final_results:
+            return False
+        
+        print("\nPIPELINE COMPLETED SUCCESSFULLY!")
+        print("=" * 50)
+        print("Check outputs/ directory for detailed results")
+        return True
+        
+    except Exception as e:
+        print(f"Pipeline failed: {str(e)}")
+        return False
+
+
 def main():
+    """Main entry point with clean argument parsing"""
     parser = argparse.ArgumentParser(
         description="Palestine Fake News Detection ML Pipeline",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python main.py --all                      # Run complete pipeline
-  python main.py --data-prep                # Run data preparation only
-  python main.py --model-selection          # Run model selection only  
-  python main.py --tuning                   # Run hyperparameter tuning only
-  python main.py --evaluation               # Run final evaluation only
-  python main.py --tuning --force-retune    # Force fresh grid search (ignore cache)
-  python main.py --config                   # Show configuration
-  python main.py --summary                  # Show pipeline info
+  python main.py                        # Run complete pipeline
+  python main.py --data-prep            # Prepare data and create splits
+  python main.py --model-selection      # Compare models using CV
+  python main.py --tuning               # Tune best model parameters
+  python main.py --evaluation           # Evaluate on test set
+  python main.py --config               # Show configuration
+  python main.py --info                 # Show pipeline information
         """
     )
     
-    # Main commands
-    parser.add_argument('--all', action='store_true',
-                       help='Run complete pipeline (recommended)')
-    parser.add_argument('--data-prep', action='store_true',
+    # Phase commands
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--data-prep', action='store_true',
                        help='Run data preparation phase only')
-    parser.add_argument('--model-selection', action='store_true',
+    group.add_argument('--model-selection', action='store_true',
                        help='Run model selection phase only')
-    parser.add_argument('--tuning', action='store_true',
+    group.add_argument('--tuning', action='store_true',
                        help='Run hyperparameter tuning phase only')
-    parser.add_argument('--evaluation', action='store_true',
+    group.add_argument('--evaluation', action='store_true',
                        help='Run final evaluation phase only')
-    parser.add_argument('--config', action='store_true',
+    group.add_argument('--config', action='store_true',
                        help='Show configuration settings')
-    parser.add_argument('--summary', action='store_true',
-                       help='Show pipeline summary')
-    
-    # Tuning options
-    parser.add_argument('--force-retune', action='store_true',
-                       help='Force fresh hyperparameter tuning (ignore cached parameters)')
-    
-    # Future features
-    parser.add_argument('--predict', type=str,
-                       help='Make single prediction on text (coming soon)')
+    group.add_argument('--info', action='store_true',
+                       help='Show pipeline information')
     
     args = parser.parse_args()
-    
-    # Ensure at least one command is provided
-    if not any([args.all, args.data_prep, args.model_selection, args.tuning, args.evaluation, args.config, args.summary, args.predict]):
-        parser.print_help()
-        return
     
     print("=" * 60)
     print("Palestine Fake News Detection ML Pipeline")
     print("=" * 60)
     
     try:
-        # Configuration display
+        # Show configuration
         if args.config:
-            from src.config import settings
-            print("CONFIGURATION")
-            print("-" * 20)
-            print(f"Datasets: {settings.DATASETS_TO_USE}")
-            print(f"CV Folds: {settings.CV_FOLDS}")
-            print(f"Max Features: {settings.TFIDF_MAX_FEATURES}")
+            _show_config()
             return
-            
-        # Pipeline summary
-        if args.summary:
-            print("PIPELINE SUMMARY")
-            print("=" * 20)
-            print("Datasets: ['text_minimal', 'text_aggressive', 'text_transformers']")
-            print("CV Folds: 5")
-            print("Max Features: 5000")
-            print("Text Cleaning: Minimal + Aggressive + Transformers")
-            print("Model Selection: 5 models on minimal & aggressive datasets")
-            print("Hyperparameter Tuning: Best 2 models with GridSearch")
-            print("Model Evaluation: Deep analysis with plots and reports")
+        
+        # Show pipeline info
+        if args.info:
+            _show_pipeline_info()
             return
-            
-        # Complete pipeline
-        if args.all:
-            # Import everything we need
-            import pandas as pd
-            from src.preprocessing.text_cleaner import prepare_data
-            from src.utils.data_splits import create_data_splits
-            from src.models.model_selection import compare_models_on_datasets
-            from src.models.hyperparameter_tuning import tune_best_models_proper
-            from src.models.model_evaluation import evaluate_final_model_properly
-            
-            # Data Loading Stage
-            print("=" * 60)
-            print("DATA LOADING")
-            print("=" * 60)
-            print("Loading data...")
-            df = pd.read_csv("data/raw/original_news_data.csv")
-            print(f"Loaded {len(df)} articles")
-            print()
-            
-            # Data Preprocessing Stage
-            print("=" * 60)
-            print("DATA PREPROCESSING")
-            print("=" * 60)
-            print("Cleaning data...")
-            clean_df = prepare_data(df)
-            print(f"After cleaning: {len(clean_df)} articles")
-            print()
-            
-            # Save separate datasets for minimal, aggressive, and transformers cleaning
-            minimal_df = clean_df[['text_minimal', 'label']].copy()
-            minimal_df = minimal_df.rename(columns={'text_minimal': 'text'})
-            aggressive_df = clean_df[['text_aggressive', 'label']].copy()
-            aggressive_df = aggressive_df.rename(columns={'text_aggressive': 'text'})
-            transformers_df = clean_df[['text_transformers', 'label']].copy()
-            transformers_df = transformers_df.rename(columns={'text_transformers': 'text'})
-            
-            minimal_df.to_csv("data/processed/minimal_cleaned.csv", index=False)
-            aggressive_df.to_csv("data/processed/aggressive_cleaned.csv", index=False)
-            transformers_df.to_csv("data/processed/transformers_cleaned.csv", index=False)
-            
-            print("Processed datasets saved:")
-            print("  - Minimal cleaning: data/processed/minimal_cleaned.csv") 
-            print("  - Aggressive cleaning: data/processed/aggressive_cleaned.csv")
-            print("  - Transformers ready: data/processed/transformers_cleaned.csv")
-            print()
-
-            # Data Splitting Stage - CRITICAL FOR PROPER ML
-            print("=" * 60)
-            print("DATA SPLITTING")
-            print("=" * 60)
-            
-            # Create consistent splits for both datasets
-            text_minimal = clean_df['text_minimal']
-            text_aggressive = clean_df['text_aggressive'] 
-            y = clean_df['label']
-            
-            splits = create_data_splits(text_minimal, text_aggressive, y, save_splits=True)
-            print()
-            
-            # Model Selection Phase
-            results = compare_models_on_datasets(splits)
-            
-            if results is None:
-                print("Model selection failed")
-                return
-            
-            # Find best 2 models across all datasets
-            sorted_results = sorted(results.items(), key=lambda x: x[1]['cv_f1_mean'], reverse=True)
-            best_models = [(result[1]['model_name'], result[1]['dataset']) for result in sorted_results[:2]]
-            
-            print("Best 2 models selected for hyperparameter tuning:")
-            for model_name, dataset in best_models:
-                f1_score = next(r[1]['cv_f1_mean'] for r in sorted_results if r[1]['model_name'] == model_name and r[1]['dataset'] == dataset)
-                print(f"  - {model_name} on {dataset}: F1={f1_score:.4f}")
-            print()
-            
-            # Hyperparameter Tuning Phase
-            tuned_results = tune_best_models_proper(best_models, splits, force_retune=args.force_retune)
-            
-            if not tuned_results:
-                print("Hyperparameter tuning failed")
-                return
-            
-            # Find the absolute best model after tuning
-            best_tuned = max(tuned_results.items(), key=lambda x: x[1]['best_score'])
-            best_model_key = best_tuned[0]
-            best_model_info = best_tuned[1]
-            
-            print(f"Best tuned model: {best_model_key} with Validation F1={best_model_info['best_score']:.4f}")
-            print()
-            
-            # Final Model Evaluation on held-out test set
-            print("=" * 60)
-            print("FINAL EVALUATION")
-            print("=" * 60)
-            
-            model_name = best_model_info['model_name']
-            dataset_name = best_model_info['dataset']
-            tuned_model = best_model_info['model']
-            
-            # Save the best model and vectorizer for Streamlit
-            import pickle
-            import os
-            os.makedirs("models/trained", exist_ok=True)
-            
-            # Save the final model
-            with open("models/trained/best_model.pkl", 'wb') as f:
-                pickle.dump(tuned_model, f)
-            
-            # Save the corresponding vectorizer
-            from src.models.model_selection import get_vectorizers_from_model_selection
-            vectorizers = get_vectorizers_from_model_selection()
-            best_vectorizer_key = f"{model_name}_{dataset_name}"
-            if best_vectorizer_key in vectorizers:
-                with open("models/trained/fitted_vectorizer.pkl", 'wb') as f:
-                    pickle.dump(vectorizers[best_vectorizer_key], f)
-                print(f"Best model and vectorizer saved: {best_vectorizer_key}")
-            
-            # Final evaluation on held-out test set
-            final_test_results = evaluate_final_model_properly(
-                tuned_model, 
-                splits,
-                dataset_name,
-                model_name
-            )
-            
-            if final_test_results:
-                print("PIPELINE COMPLETED - SCIENTIFICALLY VALID RESULTS")
-                print("=" * 60)
-                print("SUMMARY FOR REPORTING:")
-                print()
-                print("Model Selection (train+validation data only):")
-                print(f"  Best model: {model_name} on {dataset_name} dataset")
-                print(f"  CV F1 (weighted): {sorted_results[0][1]['cv_f1_mean']:.4f}")
-                print()
-                print("Hyperparameter Tuning (validation data only):")
-                print(f"  Best validation F1: {best_model_info['best_score']:.4f}")
-                print()
-                print("Final Test Results:")
-                print(f"  Test F1 (weighted): {final_test_results['test_f1_weighted']:.4f}")
-                print(f"  Test Accuracy: {final_test_results['test_accuracy']:.4f}")
-                print(f"  Fake News F1: {final_test_results['fake_news_f1']:.4f}")
-                print(f"  Real News F1: {final_test_results['real_news_f1']:.4f}")
-                if final_test_results['test_auc']:
-                    print(f"  Test AUC: {final_test_results['test_auc']:.4f}")
-                print()
-                print("Check outputs/final_evaluation/ for detailed results")
-                print("Models saved in models/trained/ for deployment")
-                print("=" * 60)
-                
-            return
-            
-        # Individual phase commands
+        
+        # Run individual phases
         if args.data_prep:
-            import pandas as pd
-            from src.preprocessing.text_cleaner import prepare_data
-            
-            print("=" * 60)
-            print("DATA PREPARATION PHASE")
-            print("=" * 60)
-            
-            # Data Loading
-            print("Loading data...")
-            df = pd.read_csv("data/raw/original_news_data.csv")
-            print(f"Loaded {len(df)} articles")
-            print()
-            
-            # Data Preprocessing
-            print("Cleaning data...")
-            clean_df = prepare_data(df)
-            print(f"After cleaning: {len(clean_df)} articles")
-            print()
-            
-            # Save datasets
-            minimal_df = clean_df[['text_minimal', 'label']].copy()
-            minimal_df = minimal_df.rename(columns={'text_minimal': 'text'})
-            aggressive_df = clean_df[['text_aggressive', 'label']].copy()
-            aggressive_df = aggressive_df.rename(columns={'text_aggressive': 'text'})
-            transformers_df = clean_df[['text_transformers', 'label']].copy()
-            transformers_df = transformers_df.rename(columns={'text_transformers': 'text'})
-            
-            minimal_df.to_csv("data/processed/minimal_cleaned.csv", index=False)
-            aggressive_df.to_csv("data/processed/aggressive_cleaned.csv", index=False)
-            transformers_df.to_csv("data/processed/transformers_cleaned.csv", index=False)
-            
-            print("Processed datasets saved:")
-            print("  - Minimal cleaning: data/processed/minimal_cleaned.csv") 
-            print("  - Aggressive cleaning: data/processed/aggressive_cleaned.csv")
-            print("  - Transformers ready: data/processed/transformers_cleaned.csv")
-            print("=" * 60)
+            print("Running data preparation phase")
+            df, splitter = _run_data_preparation()
+            print("Data preparation completed")
             return
-            
+        
         if args.model_selection:
-            import pandas as pd
-            import os
-            from src.models.model_selection import compare_models_on_datasets
-            from src.utils.data_splits import create_data_splits, load_data_splits
+            print("Running model selection phase")
+            # Load existing splits
+            from src.utils.data_splits import DataSplitter
             
-            print("=" * 60)
-            print("MODEL SELECTION")
-            print("=" * 60)
+            # Check if splits exist
+            splitter = DataSplitter.load_splits()
+            if splitter is None:
+                print("No existing splits found. Running data preparation first...")
+                df, splitter = _run_data_preparation()
             
-            # Check if cleaned data exists
-            minimal_file = "data/processed/minimal_cleaned.csv"
-            aggressive_file = "data/processed/aggressive_cleaned.csv"
-            
-            if not os.path.exists(minimal_file) or not os.path.exists(aggressive_file):
-                print("ERROR: Cleaned data not found!")
-                print("Please run data preparation first: python main.py --data-prep")
-                return
-            
-            # Load cleaned data
-            print("Loading cleaned data...")
-            minimal_df = pd.read_csv(minimal_file)
-            aggressive_df = pd.read_csv(aggressive_file)
-            print(f"  - Minimal dataset: {len(minimal_df)} articles")
-            print(f"  - Aggressive dataset: {len(aggressive_df)} articles")
-            print()
-            
-            # Check if data splits exist, create if not
-            splits = load_data_splits()
-            if splits is None:
-                print("Creating data splits...")
-                text_minimal = minimal_df['text']
-                text_aggressive = aggressive_df['text']
-                y = minimal_df['label']
-                
-                splits = create_data_splits(text_minimal, text_aggressive, y, save_splits=True)
-            else:
-                print("Using existing data splits...")
-            
-            print()
-            
-            # Model comparison
-            results = compare_models_on_datasets(splits)
-            
-            if results:
-                sorted_results = sorted(results.items(), key=lambda x: x[1]['cv_f1_mean'], reverse=True)
-                print("Top 5 model results:")
-                for i, (key, result) in enumerate(sorted_results[:5]):
-                    print(f"  {i+1}. {result['model_name']} on {result['dataset']}: F1={result['cv_f1_mean']:.4f}")
-                
-                print()
-                print("Best 2 models for hyperparameter tuning:")
-                for i, (key, result) in enumerate(sorted_results[:2]):
-                    print(f"  {i+1}. {result['model_name']} on {result['dataset']}: F1={result['cv_f1_mean']:.4f}")
-            
-            print("=" * 60)
+            _run_model_selection(splitter)
             return
-            
+        
         if args.tuning:
-            import pandas as pd
-            import os
-            from src.models.model_selection import load_model_selection_results
-            from src.models.hyperparameter_tuning import tune_best_models_proper
-            from src.utils.data_splits import load_data_splits
+            print("Running hyperparameter tuning phase")
+            # Load existing splits
+            from src.utils.data_splits import DataSplitter
             
-            # Check if model selection results exist
-            model_results = load_model_selection_results()
-            if not model_results:
-                print("ERROR: Model selection results not found!")
-                print("Please run model selection first: python main.py --model-selection")
+            splitter = DataSplitter.load_splits()
+            if splitter is None:
+                print("No data splits found. Please run data preparation first.")
                 return
             
-            # Check if data splits exist
-            splits = load_data_splits()
-            if splits is None:
-                print("ERROR: Data splits not found!")
-                print("Please run model selection first: python main.py --model-selection")
-                return
-            
-            # Get best 2 models from saved results
-            sorted_results = sorted(model_results.items(), key=lambda x: x[1]['cv_f1_mean'], reverse=True)
-            best_models = [(result[1]['model_name'], result[1]['dataset']) for result in sorted_results[:2]]
-            
-            print("Using cached model selection results:")
-            print("Tuning best 2 models:")
-            for model_name, dataset in best_models:
-                f1_score = next(r[1]['cv_f1_mean'] for r in sorted_results if r[1]['model_name'] == model_name and r[1]['dataset'] == dataset)
-                print(f"  - {model_name} on {dataset}: F1={f1_score:.4f}")
-            print()
-            
-            # Hyperparameter tuning using validation set
-            tuned_results = tune_best_models_proper(best_models, splits, force_retune=args.force_retune)
-            
-            if tuned_results:
-                best_tuned = max(tuned_results.items(), key=lambda x: x[1]['best_score'])
-                best_model_key = best_tuned[0]
-                best_model_info = best_tuned[1]
-                
-                print(f"Best tuned model: {best_model_key} with Validation F1={best_model_info['best_score']:.4f}")
-                print("Tuning completed successfully!")
-            
-            print("=" * 60)
+            _run_hyperparameter_tuning(splitter)
             return
-            
+        
         if args.evaluation:
-            import pandas as pd
-            import os
-            import pickle
-            import json
-            from src.models.model_evaluation import evaluate_final_model_properly
-            from src.utils.data_splits import load_data_splits
+            print("Running final evaluation phase")
+            # Load existing splits
+            from src.utils.data_splits import DataSplitter
             
-            print("=" * 60)
-            print("FINAL EVALUATION")
-            print("=" * 60)
-            
-            # Check if data splits exist
-            splits = load_data_splits()
-            if splits is None:
-                print("ERROR: Data splits not found!")
-                print("Please run model selection first: python main.py --model-selection")
+            splitter = DataSplitter.load_splits()
+            if splitter is None:
+                print("No data splits found. Please run data preparation first.")
                 return
             
-            # Find the best tuned model
-            tuning_dir = "outputs/hyperparameter_tuning"
-            if not os.path.exists(tuning_dir):
-                print("ERROR: No hyperparameter tuning results found!")
-                print("Please run tuning first: python main.py --tuning")
-                return
-            
-            # Load all tuning results
-            tuned_results = {}
-            for file in os.listdir(tuning_dir):
-                if file.endswith("_best_params.json"):
-                    model_dataset = file.replace("_best_params.json", "")
-                    
-                    # Load parameters
-                    with open(os.path.join(tuning_dir, file), 'r') as f:
-                        params = json.load(f)
-                    
-                    # Load model
-                    model_file = os.path.join(tuning_dir, f"{model_dataset}_tuned_model.pkl")
-                    if os.path.exists(model_file):
-                        with open(model_file, 'rb') as f:
-                            model = pickle.load(f)
-                        
-                        tuned_results[model_dataset] = {
-                            **params,
-                            'model': model
-                        }
-            
-            if not tuned_results:
-                print("ERROR: No tuned models found!")
-                print("Please run tuning first: python main.py --tuning")
-                return
-            
-            # Find best tuned model
-            best_tuned = max(tuned_results.items(), key=lambda x: x[1]['best_score'])
-            best_model_key = best_tuned[0]
-            best_model_info = best_tuned[1]
-            
-            print(f"Best tuned model: {best_model_key} with Validation F1={best_model_info['best_score']:.4f}")
-            print()
-            
-            # Extract model details
-            model_name = best_model_info['model_name']
-            dataset_name = best_model_info['dataset']
-            tuned_model = best_model_info['model']
-            
-            # Final evaluation on held-out test set
-            final_test_results = evaluate_final_model_properly(
-                tuned_model, 
-                splits,
-                dataset_name,
-                model_name
-            )
-            
-            if final_test_results:
-                print("EVALUATION SUMMARY:")
-                print(f"  Test F1 (weighted): {final_test_results['test_f1_weighted']:.4f}")
-                print(f"  Test Accuracy: {final_test_results['test_accuracy']:.4f}")
-                print(f"  Fake News F1: {final_test_results['fake_news_f1']:.4f}")
-                print(f"  Real News F1: {final_test_results['real_news_f1']:.4f}")
-                if final_test_results['test_auc']:
-                    print(f"  Test AUC: {final_test_results['test_auc']:.4f}")
-                print()
-                print("✅ Check outputs/final_evaluation/ for detailed results")
-            
-            print("=" * 60)
+            _run_final_evaluation(splitter)
             return
+        
+        # Default: Run complete pipeline
+        print("Running complete pipeline...")
+        success = _run_complete_pipeline()
+        
+        if success:
+            print("Pipeline completed successfully!")
+        else:
+            print("Pipeline failed. Check outputs for details.")
+            sys.exit(1)
             
-        # Future features
-        if args.predict:
-            print("Single prediction feature coming soon!")
-            
-    except ImportError as e:
-        print(f"Error: {e}")
-    except Exception as e:
-        print(f"Error: {e}")
+    except KeyboardInterrupt:
+        print("Pipeline interrupted by user")
         sys.exit(1)
+    except Exception as e:
+        print(f"Unexpected error: {str(e)}")
+        sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

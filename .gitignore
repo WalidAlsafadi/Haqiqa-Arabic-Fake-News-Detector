@@ -150,3 +150,6 @@ config/secrets.yml
 config/secrets.json
 *.key
 *.pem
+
+# Fine-tuning models
+models/arabert/finetuned-model/

@@ -1,232 +1,306 @@
-"""
-Updated hyperparameter tuning with proper train/validation/test splits.
-
-This module implements hyperparameter tuning using validation set only,
-ensuring that the test set remains untouched for final evaluation.
-"""
-
 import os
 import json
 import pickle
-import pandas as pd
-from scipy.sparse import vstack
 from sklearn.model_selection import ParameterGrid
 from sklearn.metrics import f1_score
+from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.naive_bayes import MultinomialNB
 import xgboost as xgb
+
 from src.config.settings import RANDOM_STATE
+from src.utils.data_splits import DataSplitter
+from src.models.model_selection import load_best_pipeline, get_best_model
 
 def get_param_grids():
-    """Get parameter grids for hyperparameter tuning"""
+    """Get parameter grids for hyperparameter tuning with proper class imbalance handling"""
     param_grids = {
         'XGBoost': {
-            'n_estimators': [100, 200],
-            'max_depth': [3, 6],
-            'learning_rate': [0.1],
-            'random_state': [RANDOM_STATE]
+            'classifier__n_estimators': [100, 200, 300],
+            'classifier__max_depth': [3, 6, 9],
+            'classifier__learning_rate': [0.1, 0.2],
+            'classifier__scale_pos_weight': [2.47],  # Handle class imbalance
+            'classifier__random_state': [RANDOM_STATE]
         },
         'Random Forest': {
-            'n_estimators': [100, 200],
-            'max_depth': [10, None],
-            'min_samples_split': [2],
-            'random_state': [RANDOM_STATE]
+            'classifier__n_estimators': [100, 200, 300],
+            'classifier__max_depth': [10, 20, None],
+            'classifier__min_samples_split': [2, 5],
+            'classifier__class_weight': ['balanced'],  # Handle class imbalance
+            'classifier__random_state': [RANDOM_STATE]
         },
         'Logistic Regression': {
-            'C': [1, 10],
-            'max_iter': [500],
-            'random_state': [RANDOM_STATE]
+            'classifier__C': [0.1, 1, 10],
+            'classifier__class_weight': ['balanced'],  # Handle class imbalance
+            'classifier__max_iter': [500],
+            'classifier__random_state': [RANDOM_STATE]
         },
         'SVM': {
-            'C': [1, 10],
-            'kernel': ['rbf'],
-            'gamma': ['scale'],
-            'random_state': [RANDOM_STATE]
+            'classifier__C': [0.1, 1, 10],
+            'classifier__kernel': ['rbf', 'linear'],
+            'classifier__class_weight': ['balanced'],  # Handle class imbalance
+            'classifier__gamma': ['scale'],
+            'classifier__random_state': [RANDOM_STATE]
+        },
+        'Naive Bayes': {
+            # Naive Bayes has no significant hyperparameters to tune
+            # Using empty dict - will skip tuning but still work
         }
     }
     return param_grids
 
-def get_model_class(model_name):
-    """Get model class for instantiation"""
-    models = {
-        'XGBoost': xgb.XGBClassifier,
-        'Random Forest': RandomForestClassifier,
-        'Logistic Regression': LogisticRegression,
-        'SVM': SVC
-    }
-    return models.get(model_name)
+def _validate_inputs(splitter):
+    """Validate inputs for hyperparameter tuning"""
+    if splitter.train_indices is None:
+        raise ValueError("DataSplitter has no splits. Call create_splits() first.")
 
-def tune_best_models_proper(best_models, splits, output_dir="outputs/hyperparameter_tuning", force_retune=False):
-    """
-    Perform hyperparameter tuning on best models using validation set.
+def _load_cached_results(output_dir, model_name, dataset_name):
+    """Load cached tuning results if available"""
+    results_file = f"{output_dir}/{model_name}_{dataset_name}_best_params.json"
+    model_file = f"{output_dir}/{model_name}_{dataset_name}_tuned_model.pkl"
     
-    ML Best Practices:
-    1. Uses validation set for hyperparameter optimization
-    2. Uses vectorizers fitted on training data only 
-    3. Test set remains untouched for final evaluation
-    4. Trains final models on train+validation combined
+    if os.path.exists(results_file) and os.path.exists(model_file):
+        try:
+            with open(results_file, 'r') as f:
+                cached_results = json.load(f)
+            with open(model_file, 'rb') as f:
+                cached_model = pickle.load(f)
+            
+            print(f"Loading cached results: F1={cached_results['best_score']:.4f}")
+            return cached_results, cached_model
+        except Exception as e:
+            print(f"Failed to load cached results: {str(e)}")
+            return None
+    return None
+
+def _perform_grid_search(baseline_pipeline, param_grid, train_text, train_labels, val_text, val_labels, model_name):
+    """Perform grid search using validation set"""
+    param_combinations = list(ParameterGrid(param_grid))
+    print(f"Testing {len(param_combinations)} parameter combinations...")
     
-    Args:
-        best_models: List of tuples [(model_name, dataset_name), ...]
-        splits: Data splits from create_data_splits()
-        output_dir: Directory to save tuning results
-        force_retune: If True, ignore cached parameters and run fresh tuning
+    best_score = 0
+    best_params = None
+    best_pipeline = None
     
-    Returns:
-        dict: Tuned models and their performance
-    """
+    for i, params in enumerate(param_combinations):
+        try:
+            # Create new pipeline with these parameters
+            # Start with a copy of the baseline pipeline to preserve TF-IDF settings
+            current_pipeline = Pipeline([
+                ('tfidf', baseline_pipeline.named_steps['tfidf']),
+                ('classifier', baseline_pipeline.named_steps['classifier'].__class__(**baseline_pipeline.named_steps['classifier'].get_params()))
+            ])
+            current_pipeline.set_params(**params)
+            
+            # Train on training set
+            current_pipeline.fit(train_text.fillna(''), train_labels)
+            
+            # Evaluate on validation set
+            val_predictions = current_pipeline.predict(val_text.fillna(''))
+            val_f1 = f1_score(val_labels, val_predictions, average='weighted')
+            
+            if val_f1 > best_score:
+                best_score = val_f1
+                best_params = params
+                best_pipeline = current_pipeline
+            
+        except Exception as e:
+            continue
     
-    print("=" * 60)
-    print("HYPERPARAMETER TUNING")
-    print("=" * 60)
-    print("Strategy: Validation-based hyperparameter optimization")
-    print("Training data for fitting, validation for optimization, test held out")
-    os.makedirs(output_dir, exist_ok=True)
+    return best_score, best_params, best_pipeline
+
+def _train_final_model(baseline_pipeline, best_params, train_val_text, train_val_labels):
+    """Train final model on combined train+validation data"""
+    final_pipeline = Pipeline([
+        ('tfidf', baseline_pipeline.named_steps['tfidf']),
+        ('classifier', baseline_pipeline.named_steps['classifier'].__class__(**baseline_pipeline.named_steps['classifier'].get_params()))
+    ])
+    final_pipeline.set_params(**best_params)
+    final_pipeline.fit(train_val_text.fillna(''), train_val_labels)
     
-    from src.utils.data_splits import get_train_data, get_val_data
-    from src.models.model_selection import get_vectorizers_from_model_selection
-    
-    # Load vectorizers fitted during model selection
-    vectorizers = get_vectorizers_from_model_selection()
-    if not vectorizers:
-        print("ERROR: No fitted vectorizers found from model selection!")
-        print("Please run model selection first: python main.py --model-selection")
-        return None
-    
-    param_grids = get_param_grids()
-    tuned_results = {}
-    
-    for model_name, dataset_name in best_models:
-        print(f"Tuning {model_name} on {dataset_name} dataset...")
-        print("-" * 50)
-        
-        # Load cached results if available
+    return final_pipeline
+
+def _save_tuning_results(results, final_pipeline, output_dir, model_name, dataset_name):
+    """Save tuning results and final model"""
+    try:
         results_file = f"{output_dir}/{model_name}_{dataset_name}_best_params.json"
         model_file = f"{output_dir}/{model_name}_{dataset_name}_tuned_model.pkl"
         
-        if os.path.exists(results_file) and os.path.exists(model_file) and not force_retune:
-            print(f"  ✅ Loading cached results from {results_file}")
-            with open(results_file, 'r') as f:
-                saved_results = json.load(f)
-            with open(model_file, 'rb') as f:
-                saved_model = pickle.load(f)
-            
-            tuned_results[f"{model_name}_{dataset_name}"] = {
-                **saved_results,
-                'model': saved_model,
-                'dataset': dataset_name
-            }
-            print(f"  📊 Loaded {model_name}_{dataset_name}: Validation F1={saved_results['best_score']:.4f}")
-            continue
-        elif force_retune and os.path.exists(results_file):
-            print(f"  🔄 Force retune enabled, running fresh hyperparameter search...")
+        with open(results_file, 'w') as f:
+            json.dump(results, f, indent=2)
         
-        # Get vectorizer for this model-dataset combination
-        vectorizer_key = f"{model_name}_{dataset_name}"
-        if vectorizer_key not in vectorizers:
-            print(f"  ❌ No vectorizer found for {vectorizer_key}")
-            continue
+        with open(model_file, 'wb') as f:
+            pickle.dump(final_pipeline, f)
         
-        vectorizer = vectorizers[vectorizer_key]
-        print(f"  ✅ Using cached vectorizer: {vectorizer_key}")
-        
-        # Get data splits
-        train_text, train_labels = get_train_data(splits, dataset_name)
-        val_text, val_labels = get_val_data(splits, dataset_name)
-        
-        # Transform using the fitted vectorizer (no refitting!)
-        X_train = vectorizer.transform(train_text.fillna(''))
-        X_val = vectorizer.transform(val_text.fillna(''))
-        
-        print(f"  📊 Train set: {X_train.shape[0]} samples")
-        print(f"  📊 Validation set: {X_val.shape[0]} samples")
-        
-        # Perform hyperparameter optimization
-        try:
-            model_class = get_model_class(model_name)
-            if model_class is None:
-                print(f"  ❌ Model {model_name} not supported for tuning")
-                continue
-            
-            param_grid = param_grids.get(model_name, {})
-            if not param_grid:
-                print(f"  ❌ No parameter grid defined for {model_name}")
-                continue
-            
-            print(f"  🔍 Testing {len(list(ParameterGrid(param_grid)))} parameter combinations...")
-            
-            best_score = 0
-            best_params = None
-            all_scores = []
-            
-            # Manual grid search using validation set
-            for i, params in enumerate(ParameterGrid(param_grid)):
-                # Train model with these parameters on training set
-                model = model_class(**params)
-                model.fit(X_train, train_labels)
-                
-                # Evaluate on validation set
-                val_predictions = model.predict(X_val)
-                val_f1 = f1_score(val_labels, val_predictions, average='weighted')
-                
-                all_scores.append(val_f1)
-                
-                if val_f1 > best_score:
-                    best_score = val_f1
-                    best_params = params
-                
-                print(f"    Combination {i+1}: F1={val_f1:.4f}")
-            
-            print(f"  🎯 Best validation F1: {best_score:.4f}")
-            print(f"  ⚙️  Best parameters: {best_params}")
-            
-            # Train final model with best parameters on train+validation combined
-            print(f"  🔧 Training final model on train+validation combined...")
-            final_model = model_class(**best_params)
-            
-            # Combine train and validation for final training
-            X_train_val = vstack([X_train, X_val])
-            y_train_val = pd.concat([train_labels, val_labels], ignore_index=True)
-            
-            final_model.fit(X_train_val, y_train_val)
-            print(f"  ✅ Final model trained on {X_train_val.shape[0]} samples")
-            
-            # Save results
-            results = {
-                'model_name': model_name,
-                'dataset': dataset_name,
-                'best_params': best_params,
-                'best_score': best_score,
-                'tuning_method': 'validation_based',
-                'train_size': X_train.shape[0],
-                'val_size': X_val.shape[0],
-                'final_train_size': X_train_val.shape[0]
-            }
-            
-            # Save parameters to JSON (without model object)
-            with open(results_file, 'w') as f:
-                json.dump(results, f, indent=2)
-            
-            # Save model separately
-            with open(model_file, 'wb') as f:
-                pickle.dump(final_model, f)
-            
-            tuned_results[f"{model_name}_{dataset_name}"] = {
-                **results,
-                'model': final_model
-            }
-            
-            print(f"  💾 Results saved to {results_file}")
-            print(f"  💾 Model saved to {model_file}")
-            
-        except Exception as e:
-            print(f"  ❌ Hyperparameter tuning failed: {str(e)}")
-            continue
-        
-        print()
+        return True
+    except Exception as e:
+        print(f"Failed to save results: {str(e)}")
+        return False
+
+def tune_best_model(splitter, output_dir="outputs/hyperparameter_tuning"):
+    """
+    Perform hyperparameter tuning on the best model from model selection.
     
-    print("Hyperparameter tuning completed!")
-    print("=" * 60)
-    return tuned_results
+    ML Best Practices:
+    1. Uses only the best model from model selection
+    2. Uses validation set for hyperparameter optimization
+    3. Test set remains untouched for final evaluation
+    4. Pipeline approach with TF-IDF + model tuning
+    
+    Args:
+        splitter: DataSplitter instance with loaded splits
+        output_dir: Directory to save tuning results
+    
+    Returns:
+        tuple: (results dict, final_pipeline) or None if failed
+    """
+    
+    # Validate inputs
+    _validate_inputs(splitter)
+    
+    print("\nHYPERPARAMETER TUNING")
+    print("=" * 40)
+    
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Load best model info from model selection
+    best_model_info = get_best_model()
+    if not best_model_info:
+        print("No model selection results found!")
+        print("Please run model selection first")
+        return None
+    
+    model_name = best_model_info['model_name']
+    dataset_name = best_model_info['dataset']
+    
+    print(f"Model: {model_name}")
+    print(f"Dataset: {dataset_name}")
+    print(f"Baseline CV F1: {best_model_info['cv_f1_mean']:.4f}")
+    print(f"Baseline Val F1: {best_model_info['val_f1_score']:.4f}")
+    
+    # Check for cached results
+    cached_result = _load_cached_results(output_dir, model_name, dataset_name)
+    if cached_result:
+        return cached_result
+    
+    # Load baseline pipeline
+    baseline_pipeline, _ = load_best_pipeline()
+    if baseline_pipeline is None:
+        print("Could not load best pipeline!")
+        return None
+    
+    # Dataset file mapping
+    dataset_files = {
+        'minimal': 'data/processed/minimal_cleaned.csv',
+        'aggressive': 'data/processed/aggressive_cleaned.csv'
+    }
+    
+    # Get training and validation data from CSV
+    csv_path = dataset_files[dataset_name]
+    if not os.path.exists(csv_path):
+        print(f"Dataset file not found: {csv_path}")
+        return None
+        
+    train_text, train_labels = splitter.get_train_from_csv(csv_path)
+    val_text, val_labels = splitter.get_val_from_csv(csv_path)
+    
+    # Get parameter grid for this model
+    param_grids = get_param_grids()
+    param_grid = param_grids.get(model_name, {})
+    
+    if not param_grid:
+        print(f"No parameter grid defined for {model_name}")
+        return None
+    
+    # Handle models with no tunable parameters (like Naive Bayes)
+    if len(param_grid) == 0:
+        print(f"{model_name} has no hyperparameters to tune")
+        
+        # Train baseline on train+validation data
+        train_val_text, train_val_labels = splitter.get_train_val_from_csv(csv_path)
+        baseline_pipeline.fit(train_val_text.fillna(''), train_val_labels)
+        
+        # Save results showing no improvement (no tuning performed)
+        results = {
+            'model_name': model_name,
+            'dataset': dataset_name,
+            'best_params': {},
+            'best_score': best_model_info['val_f1_score'],  # Same as baseline
+            'baseline_score': best_model_info['val_f1_score'],
+            'improvement': 0.0,  # No improvement possible
+            'train_size': len(train_text),
+            'val_size': len(val_text),
+            'final_train_size': len(train_val_text)
+        }
+        
+        if _save_tuning_results(results, baseline_pipeline, output_dir, model_name, dataset_name):
+            return results, baseline_pipeline
+        else:
+            print("Failed to save results")
+            return None
+    
+    # Perform grid search
+    best_score, best_params, best_pipeline = _perform_grid_search(
+        baseline_pipeline, param_grid, train_text, train_labels, val_text, val_labels, model_name
+    )
+    
+    if best_pipeline is None:
+        print("All parameter combinations failed!")
+        return None
+    
+    print(f"Best validation F1: {best_score:.4f}")
+    print(f"Improvement: {best_score - best_model_info['val_f1_score']:.4f}")
+    
+    # Train final model on train+validation combined
+    train_val_text, train_val_labels = splitter.get_train_val_from_csv(csv_path)
+    final_pipeline = _train_final_model(baseline_pipeline, best_params, train_val_text, train_val_labels)
+    
+    # Save results
+    results = {
+        'model_name': model_name,
+        'dataset': dataset_name,
+        'best_params': best_params,
+        'best_score': best_score,
+        'baseline_score': best_model_info['val_f1_score'],
+        'improvement': best_score - best_model_info['val_f1_score'],
+        'train_size': len(train_text),
+        'val_size': len(val_text),
+        'final_train_size': len(train_val_text)
+    }
+    
+    if _save_tuning_results(results, final_pipeline, output_dir, model_name, dataset_name):
+        print(f"\nTuning complete! Results saved to: {output_dir}")
+        return results, final_pipeline
+    else:
+        print("Failed to save tuning results")
+        return None
+
+def load_best_tuned_model():
+    """Load the best tuned model for final evaluation"""
+    best_model_info = get_best_model()
+    if not best_model_info:
+        print("No model selection results found")
+        return None
+    
+    model_name = best_model_info['model_name']
+    dataset_name = best_model_info['dataset']
+    
+    model_file = f"outputs/hyperparameter_tuning/{model_name}_{dataset_name}_tuned_model.pkl"
+    results_file = f"outputs/hyperparameter_tuning/{model_name}_{dataset_name}_best_params.json"
+    
+    if os.path.exists(model_file) and os.path.exists(results_file):
+        try:
+            with open(model_file, 'rb') as f:
+                model = pickle.load(f)
+            with open(results_file, 'r') as f:
+                results = json.load(f)
+            
+            return model, results
+        except Exception as e:
+            print(f"Failed to load tuned model: {str(e)}")
+            return None
+    else:
+        print("No tuned model found. Please run hyperparameter tuning first.")
+        return None
