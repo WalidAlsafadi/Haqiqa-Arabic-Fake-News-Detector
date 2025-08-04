@@ -14,8 +14,6 @@ models/arabert/checkpoints/
 
 # Output files
 outputs/*/logs/
-outputs/*/*.png
-outputs/*/*.jpg
 outputs/*/*.pdf
 outputs/*/*.zip
 !outputs/*/.gitkeep
