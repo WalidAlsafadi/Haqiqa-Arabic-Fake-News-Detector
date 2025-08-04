@@ -1,46 +1,76 @@
 # Palestine Fake News Detector
 
-A professional machine learning system for detecting fake news in Palestinian Arabic content. Built with industry-standard ML practices, achieving **90.61% accuracy** and **96.53% AUC** on held-out test data.
+A comprehensive machine learning system for detecting fake news in Palestinian Arabic content. Features both **traditional ML** (XGBoost) and **state-of-the-art transformer models** (AraBERT) with production-ready deployment capabilities.
 
 ## 🎯 Project Overview
 
-This project addresses misinformation about Palestine using advanced machine learning and proper scientific methodology. The system provides reliable fake news detection for Arabic content with production-ready deployment.
+This project addresses misinformation about Palestine using advanced machine learning techniques and proper scientific methodology. The system provides reliable fake news detection for Arabic content with multiple model approaches and deployment options.
 
 ## ✨ Key Features
 
-- **High-Performance Arabic NLP** — 90.61% test accuracy, 96.53% AUC
-- **Professional ML Pipeline** — 5-fold cross-validation, proper train/validation/test splits
-- **Clean Architecture** — Modular, well-documented, industry-standard code
-- **Multi-Level Text Processing** — Optimized Arabic cleaning for different model types
-- **Production Ready** — Streamlit web app with trained models
-- **Comprehensive Evaluation** — Detailed metrics, visualizations, and analysis
+### 🤖 Dual Model Approach
 
-## 📊 Performance Metrics
+- **Traditional ML**: XGBoost with TF-IDF (90.61% accuracy, 96.53% AUC)
+- **Transformer Model**: Fine-tuned AraBERT (93.48% accuracy, 98.1% AUC)
 
-### Test Set Results (Never Seen During Training)
+### 🔬 Professional ML Pipeline
+
+- **Rigorous Validation**: 5-fold cross-validation, proper train/validation/test splits
+- **Clean Architecture**: Modular, well-documented, industry-standard code
+- **Multi-Level Processing**: Optimized Arabic cleaning for different model types
+- **Production Ready**: CLI tools, web apps, and API-ready inference
+
+### 📊 Comprehensive Evaluation
+
+- **Detailed Metrics**: Classification reports, confusion matrices, ROC/PR curves
+- **Scientific Methodology**: No data leakage, reproducible results
+- **Multiple Approaches**: Traditional ML + Deep Learning comparison
+
+## 📊 Performance Comparison
+
+### AraBERT (Transformer Model)
+
+- **Accuracy**: 93.48%
+- **AUC**: 98.1%
+- **F1-Score**: 89.01%
+- **Real News F1**: 95.37%
+- **Fake News F1**: 89.01%
+
+### XGBoost (Traditional ML)
 
 - **Accuracy**: 90.61%
 - **AUC**: 96.53%
 - **F1-Score**: 90.49%
-- **Precision**: 91.30%
-- **Recall**: 89.72%
-
-### Scientific Methodology
-
-- **Data Splits**: 60% train, 20% validation, 20% test (consistent throughout)
-- **Cross-Validation**: 5-fold CV on training data for model selection
-- **No Data Leakage**: Proper train/validation methodology
-- **Reproducible**: Fixed random seeds and saved splits
+- **Real News F1**: 93.19%
+- **Fake News F1**: 84.85%
 
 ## 🛠️ Tech Stack
 
+### Core ML & Data Science
+
 - **Python 3.12** - Core programming language
+- **Scikit-learn** - Traditional ML framework
 - **XGBoost** - High-performance gradient boosting
-- **Scikit-learn** - Machine learning framework
-- **NLTK** - Arabic text processing
-- **Streamlit** - Web application framework
 - **Pandas/NumPy** - Data manipulation
+
+### Deep Learning & Transformers
+
+- **PyTorch** - Deep learning framework
+- **Transformers** - Hugging Face transformer models
+- **AraBERT** - Arabic BERT model (aubmindlab/bert-base-arabertv02)
+- **Datasets** - Efficient data loading
+
+### Arabic NLP
+
+- **NLTK** - Arabic text processing
+- **Arabic-Stopwords** - Arabic stopword removal
+- **Sentencepiece** - Subword tokenization
+
+### Deployment & Visualization
+
+- **Streamlit** - Web application framework
 - **Matplotlib/Seaborn** - Visualization
+- **Joblib** - Model persistence
 
 ## 🚀 Quick Start
 
@@ -61,62 +91,80 @@ pip install -r requirements.txt
 
 ### Usage
 
-#### Complete ML Pipeline
+#### Traditional ML Pipeline (XGBoost)
 
 ```bash
-# Run full pipeline (data prep → model selection → tuning → evaluation)
+# Run complete ML pipeline
 python main.py --all
-```
 
-#### Individual Components
-
-```bash
-# Data preparation
+# Individual components
 python main.py --data-prep
-
-# Model selection with 5-fold cross-validation
 python main.py --model-selection
-
-# Hyperparameter tuning
 python main.py --tuning
-
-# Final evaluation
 python main.py --evaluation
 ```
 
-#### Web Application
+#### AraBERT (Transformer Model)
 
 ```bash
-# Launch Streamlit app
+# Train AraBERT model
+python run_arabert_training.py
+
+# Evaluate AraBERT model
+python run_arabert_evaluation.py
+
+# Interactive fake news detection
+python detect_fake_news.py
+```
+
+#### Web Applications
+
+```bash
+# Traditional ML web app
 streamlit run app/streamlit_app.py
+
+# AraBERT inference (coming soon)
+python -m src.transformers.arabert.inference
 ```
 
 ## 📁 Project Structure
 
 ```
 Palestine-Fake-News-Detector/
-├── main.py                    # Complete ML pipeline entry point
-├── requirements.txt           # Project dependencies
+├── main.py                      # Traditional ML pipeline entry point
+├── run_arabert_training.py      # AraBERT training script
+├── run_arabert_evaluation.py    # AraBERT evaluation script
+├── detect_fake_news.py          # Interactive AraBERT CLI
+├── requirements.txt             # Project dependencies
 ├── app/
-│   └── streamlit_app.py      # Web application interface
+│   └── streamlit_app.py        # Web application interface
 ├── src/
 │   ├── config/
-│   │   └── settings.py       # Configuration parameters
+│   │   └── settings.py         # Configuration parameters
 │   ├── preprocessing/
-│   │   └── text_cleaner.py   # Arabic text processing
-│   ├── models/
-│   │   ├── model_selection.py    # Cross-validation & model comparison
-│   │   ├── hyperparameter_tuning.py  # Parameter optimization
-│   │   └── model_evaluation.py   # Final evaluation & metrics
+│   │   └── text_cleaner.py     # Arabic text processing
+│   ├── models/                 # Traditional ML models
+│   │   ├── model_selection.py
+│   │   ├── hyperparameter_tuning.py
+│   │   └── model_evaluation.py
+│   ├── transformers/           # Transformer models
+│   │   └── arabert/
+│   │       ├── training.py     # AraBERT training
+│   │       ├── evaluation.py   # AraBERT evaluation
+│   │       ├── inference.py    # AraBERT inference
+│   │       └── model_utils.py  # Model utilities
 │   └── utils/
-│       └── data_splits.py    # Consistent data splitting
+│       └── data_splits.py      # Consistent data splitting
 ├── data/
-│   ├── raw/                  # Original dataset
-│   └── processed/            # Cleaned datasets
+│   ├── raw/                    # Original dataset
+│   └── processed/              # Cleaned datasets
 ├── models/
-│   └── trained/              # Saved models & vectorizers
-├── outputs/                  # Results, plots, and reports
-└── notebooks/                # Exploratory data analysis
+│   ├── trained/                # Traditional ML models
+│   └── arabert/                # AraBERT models
+├── outputs/                    # Results, plots, and reports
+│   ├── final_evaluation/       # Traditional ML results
+│   └── arabert_evaluation/     # AraBERT results
+└── notebooks/                  # Exploratory data analysis
 ```
 
 ## 📈 Methodology
@@ -132,16 +180,24 @@ This project follows ML industry best practices:
 
 ## 🎯 Results Summary
 
-The optimized XGBoost model achieves excellent performance:
+### AraBERT (State-of-the-Art)
+
+- **Model**: Fine-tuned AraBERT (aubmindlab/bert-base-arabertv02)
+- **Preprocessing**: Transformer-optimized Arabic cleaning
+- **Training**: 7 epochs with early stopping
+- **Test Accuracy**: 93.48%
+- **Test AUC**: 98.1%
+
+### XGBoost (Traditional ML Baseline)
 
 - **Model**: XGBoost with class imbalance handling
 - **Features**: TF-IDF (5000 features, Arabic-optimized)
 - **Preprocessing**: Minimal cleaning (best performing)
 - **Cross-Validation F1**: 89.72% ± 1.82% (5-fold CV)
-- **Final Test Accuracy**: 90.61%
+- **Test Accuracy**: 90.61%
 - **Test AUC**: 96.53%
 
-All results follow proper ML validation methodology.
+Both models follow proper ML validation methodology with consistent data splits and no data leakage.
 
 ## Contact
 

@@ -4,6 +4,37 @@ __pycache__/
 *$py.class
 *.so
 
+# Model files (large binaries)
+# models/trained/*.pkl
+models/trained/*.joblib
+models/arabert/finetuned-model/
+models/arabert/checkpoints/
+!models/trained/.gitkeep
+!models/arabert/.gitkeep
+
+# Output files
+outputs/*/logs/
+outputs/*/*.png
+outputs/*/*.jpg
+outputs/*/*.pdf
+outputs/*/*.zip
+!outputs/*/.gitkeep
+
+# PyTorch models
+*.pth
+*.pt
+
+# Transformers cache
+.cache/
+transformers_cache/
+
+# Streamlit
+.streamlit/
+
+# Data files (if large)
+# data/raw/*.csv
+# data/processed/*.csv
+
 # Distribution / packaging
 .Python
 build/

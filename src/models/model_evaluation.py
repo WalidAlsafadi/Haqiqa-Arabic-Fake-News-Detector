@@ -69,7 +69,7 @@ def _calculate_metrics(test_labels, y_pred, y_pred_proba=None):
 def _save_detailed_results(metrics, model_name, dataset_name, test_text, test_labels, y_pred, tuning_results, output_dir):
     """Save detailed evaluation results to file"""
     try:
-        results_file = f"{output_dir}/FINAL_{model_name}_{dataset_name}_results.txt"
+        results_file = f"{output_dir}/{model_name}_{dataset_name}_results.txt"
         
         # Generate classification report and confusion matrix
         class_report = classification_report(test_labels, y_pred, digits=4)
@@ -122,7 +122,7 @@ def _generate_evaluation_plots(test_labels, y_pred, y_pred_proba, model_name, da
         plt.xlabel('Predicted')
         plt.ylabel('Actual')
         plt.tight_layout()
-        plt.savefig(f"{output_dir}/FINAL_{model_name}_{dataset_name}_confusion_matrix.png", dpi=300, bbox_inches='tight')
+        plt.savefig(f"{output_dir}/{model_name}_{dataset_name}_confusion_matrix.png", dpi=300, bbox_inches='tight')
         plt.close()
         
         # 2. ROC Curve (if probabilities available)
@@ -140,7 +140,7 @@ def _generate_evaluation_plots(test_labels, y_pred, y_pred_proba, model_name, da
             plt.legend()
             plt.grid(True, alpha=0.3)
             plt.tight_layout()
-            plt.savefig(f"{output_dir}/FINAL_{model_name}_{dataset_name}_roc_curve.png", dpi=300, bbox_inches='tight')
+            plt.savefig(f"{output_dir}/{model_name}_{dataset_name}_roc_curve.png", dpi=300, bbox_inches='tight')
             plt.close()
         
         # 3. Precision-Recall Curve  
@@ -164,7 +164,7 @@ def _generate_evaluation_plots(test_labels, y_pred, y_pred_proba, model_name, da
             plt.legend()
             plt.grid(True, alpha=0.3)
             plt.tight_layout()
-            plt.savefig(f"{output_dir}/FINAL_{model_name}_{dataset_name}_pr_curve.png", dpi=300, bbox_inches='tight')
+            plt.savefig(f"{output_dir}/{model_name}_{dataset_name}_pr_curve.png", dpi=300, bbox_inches='tight')
             plt.close()
             
         print(f"Evaluation plots saved to: {output_dir}")

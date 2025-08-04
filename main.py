@@ -113,9 +113,6 @@ def _run_model_selection(splitter):
     """Run model selection phase with cross-validation"""
     from src.models.model_selection import compare_models
     
-    print("\nSTARTING MODEL SELECTION")
-    print("=" * 50)
-    
     # Create output directory
     os.makedirs("outputs/model_selection", exist_ok=True)
     
@@ -135,9 +132,6 @@ def _run_hyperparameter_tuning(splitter):
     """Run hyperparameter tuning phase"""
     from src.models.hyperparameter_tuning import tune_best_model
     
-    print("\nSTARTING HYPERPARAMETER TUNING")
-    print("=" * 50)
-    
     # Tune the best model
     result = tune_best_model(splitter)
     
@@ -153,9 +147,6 @@ def _run_hyperparameter_tuning(splitter):
 def _run_final_evaluation(splitter):
     """Run final evaluation phase"""
     from src.models.model_evaluation import evaluate_final_model
-    
-    print("\nSTARTING FINAL EVALUATION")
-    print("=" * 50)
     
     # Evaluate on test set
     results = evaluate_final_model(splitter)
@@ -177,9 +168,7 @@ def _run_final_evaluation(splitter):
 
 def _run_complete_pipeline():
     """Run the complete ML pipeline"""
-    print("PALESTINE FAKE NEWS DETECTION PIPELINE")
-    print("=" * 60)
-    
+
     try:
         # Phase 1: Data Preparation
         df, splitter = _run_data_preparation()
@@ -212,7 +201,7 @@ def _run_complete_pipeline():
 def main():
     """Main entry point with clean argument parsing"""
     parser = argparse.ArgumentParser(
-        description="Palestine Fake News Detection ML Pipeline",
+        description="Palestine Fake News Detection  Machine Learning Pipeline",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

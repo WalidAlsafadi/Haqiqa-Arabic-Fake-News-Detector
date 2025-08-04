@@ -1,0 +1,34 @@
+FINAL MODEL EVALUATION RESULTS
+============================================================
+Model: AraBERT
+Dataset: transformers
+Test Set Size: 905 samples
+Evaluation Date: 2025-08-04 12:08:27.649392
+
+SUMMARY METRICS:
+----------------------------------------
+Test Accuracy: 0.9348
+Test F1 (weighted): 0.9353
+Test F1 (macro): 0.9219
+Test Precision: 0.8659
+Test Recall: 0.9157
+Real News F1: 0.9537
+Fake News F1: 0.8901
+Test AUC: 0.9814
+
+DETAILED CLASSIFICATION REPORT:
+------------------------------------------------------------
+              precision    recall  f1-score   support
+
+        Real     0.9650    0.9425    0.9537       644
+        Fake     0.8659    0.9157    0.8901       261
+
+    accuracy                         0.9348       905
+   macro avg     0.9155    0.9291    0.9219       905
+weighted avg     0.9364    0.9348    0.9353       905
+
+
+CONFUSION MATRIX:
+------------------------------
+[[607  37]
+ [ 22 239]]
