@@ -32,7 +32,7 @@ This project addresses misinformation about Palestine using advanced machine lea
 
 - **Accuracy**: 93.48%
 - **AUC**: 98.1%
-- **F1-Score**: 89.01%
+- **Weighted F1-Score**: 93.53%
 - **Real News F1**: 95.37%
 - **Fake News F1**: 89.01%
 
@@ -40,7 +40,7 @@ This project addresses misinformation about Palestine using advanced machine lea
 
 - **Accuracy**: 90.61%
 - **AUC**: 96.53%
-- **F1-Score**: 90.49%
+- **Weighted F1-Score**: 90.79%
 - **Real News F1**: 93.19%
 - **Fake News F1**: 84.85%
 
