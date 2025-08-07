@@ -13,7 +13,7 @@
   },
   "functions": {
     "app/**": {
-      "runtime": "nodejs@18"
+      "runtime": "nodejs18.x"
     }
   },
   "rewrites": [
