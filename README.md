@@ -68,9 +68,11 @@ This project addresses misinformation about Palestine using advanced machine lea
 
 ### Deployment & Visualization
 
-- **Streamlit** - Web application framework
+- **Next.js + Tailwind** - Modern web application framework
+- **Streamlit** - Traditional web application framework
 - **Matplotlib/Seaborn** - Visualization
 - **Joblib** - Model persistence
+- **Gradio** - Hugging Face Space deployment
 
 ## 🚀 Quick Start
 
@@ -119,6 +121,37 @@ python detect_fake_news.py
 
 #### Web Applications
 
+**حقيقة (Haqiqa) - Modern Arabic Web App**
+
+Professional Arabic RTL web application for Palestine fake news detection.
+
+```bash
+# Navigate to modern frontend
+cd webapp/frontend
+
+# Install optimized dependencies
+npm install
+
+# Run development server
+npm run dev
+
+# Build for production deployment
+npm run build
+```
+
+Visit `http://localhost:3000`
+
+**Features:**
+
+- ✨ Full Arabic RTL support with Cairo font
+- 🎨 Modern responsive design with Tailwind CSS
+- 📱 Mobile-optimized interface
+- 🔍 Real-time news analysis
+- 📧 Contact form integration
+- 🚀 Production-ready for Vercel deployment
+
+**Traditional Streamlit App**
+
 ```bash
 # Traditional ML web app
 streamlit run app/streamlit_app.py
@@ -137,7 +170,18 @@ Palestine-Fake-News-Detector/
 ├── detect_fake_news.py          # Interactive AraBERT CLI
 ├── requirements.txt             # Project dependencies
 ├── app/
-│   └── streamlit_app.py        # Web application interface
+│   └── streamlit_app.py        # Traditional web application interface
+├── webapp/                     # Modern web application
+│   ├── backend/                # Gradio backend for Hugging Face Spaces
+│   │   ├── app.py             # AraBERT model integration
+│   │   ├── requirements.txt
+│   │   └── README.md
+│   └── frontend/              # Next.js frontend application
+│       ├── app/               # Next.js app directory
+│       ├── components/        # React components
+│       ├── public/           # Static assets
+│       ├── package.json
+│       └── tailwind.config.ts
 ├── src/
 │   ├── config/
 │   │   └── settings.py         # Configuration parameters
@@ -198,6 +242,32 @@ This project follows ML industry best practices:
 - **Test AUC**: 96.53%
 
 Both models follow proper ML validation methodology with consistent data splits and no data leakage.
+
+## 🚀 Live Demo & Deployment
+
+### Frontend Demo
+
+The modern web application is ready for deployment and features:
+
+- **Portfolio-ready design** with Arabic RTL support
+- **Real-time AraBERT integration** via Hugging Face Spaces
+- **Responsive interface** optimized for all devices
+- **Professional UI/UX** with modern design patterns
+
+### Hugging Face Space
+
+Experience the AraBERT model live:
+
+- **Model:** [walidalsafadi/arabert-fake-news-detector](https://huggingface.co/spaces/walidalsafadi/arabert-fake-news-detector)
+- **API:** Available for real-time predictions
+- **Performance:** 93.48% accuracy on Palestinian Arabic news
+
+### Deployment Options
+
+1. **Vercel/Netlify** - Frontend deployment
+2. **Hugging Face Spaces** - Model hosting (already deployed)
+3. **Docker** - Complete containerized deployment
+4. **Traditional hosting** - Via build output
 
 ## Contact
 

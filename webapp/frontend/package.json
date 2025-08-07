@@ -1,0 +1,43 @@
+{
+  "name": "arabert-fake-news-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@radix-ui/react-alert-dialog": "^1.1.1",
+    "@radix-ui/react-dialog": "^1.1.1",
+    "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-toast": "^1.2.1",
+    "@radix-ui/react-toggle": "^1.1.0",
+    "@radix-ui/react-toggle-group": "^1.1.0",
+    "@types/node": "20.6.2",
+    "@types/react": "18.2.22",
+    "@types/react-dom": "18.2.7",
+    "autoprefixer": "10.4.15",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.0.0",
+    "date-fns": "^3.6.0",
+    "embla-carousel-react": "^8.3.0",
+    "eslint": "8.49.0",
+    "eslint-config-next": "13.5.1",
+    "lucide-react": "^0.446.0",
+    "next": "^15.4.6",
+    "postcss": "^8.5.6",
+    "react": "18.2.0",
+    "react-circular-progressbar": "^2.2.0",
+    "react-day-picker": "^8.10.1",
+    "react-dom": "18.2.0",
+    "react-hook-form": "^7.62.0",
+    "tailwind-merge": "^2.5.2",
+    "tailwindcss": "3.3.3",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "5.2.2"
+  }
+}
