@@ -36,9 +36,9 @@ export default function About() {
                 نهج مزدوج النماذج
               </h3>
               <ul className="text-gray-600 space-y-2 text-sm">
-                <li>• Traditional ML: XGBoost</li>
-                <li>• Transformers: AraBERT</li>
-                <li>• Accuracy: 93.48%</li>
+                <li>Traditional ML: XGBoost •</li>
+                <li>Transformers: AraBERT •</li>
+                <li>Accuracy: 93.48% •</li>
               </ul>
             </CardContent>
           </Card>
@@ -52,9 +52,9 @@ export default function About() {
                 خط إنتاج احترافي
               </h3>
               <ul className="text-gray-600 space-y-2 text-sm">
-                <li>• التحقق المتقاطع 5 مرات</li>
-                <li>• معمارية نظيفة ومعيارية</li>
-                <li>• جاهز للإنتاج الفوري</li>
+                <li>5 fold cross-validation •</li>
+                <li>Clean & professional pipeline •</li>
+                <li>Ready for production •</li>
               </ul>
             </CardContent>
           </Card>
@@ -68,9 +68,9 @@ export default function About() {
                 تقنيات متقدمة
               </h3>
               <ul className="text-gray-600 space-y-2 text-sm">
-                <li>• معالجة النصوص العربية</li>
-                <li>• تحليل المشاعر والسياق</li>
-                <li>• نشر سحابي متطور</li>
+                <li>Natural language processing •</li>
+                <li>Sentiment analysis and context understanding •</li>
+                <li>Advanced cloud deployment •</li>
               </ul>
             </CardContent>
           </Card>

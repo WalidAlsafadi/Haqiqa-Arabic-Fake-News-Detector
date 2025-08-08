@@ -209,6 +209,9 @@ Palestine-Fake-News-Detector/
 │   └── arabert_evaluation/  # AraBERT specific results
 ├── notebooks/               # Jupyter notebooks for analysis
 └── reports/                 # Research documentation and figures
+```
+
+```
 │   ├── components/ # React components
 │   ├── public/ # Static assets
 │   ├── package.json
