@@ -272,10 +272,10 @@ Experience the AraBERT model live:
 ## Contact
 
 **Walid Alsafadi**  
-Email: walid.k.alsafadi@gmail.com
-GitHub: [@WalidAlsafadi](https://github.com/WalidAlsafadi)
-Hugging Face: [@WalidAlsafadi](https://huggingface.co/WalidAlsafadi)
-LinkedIn: [in/WalidAlsafadi](https://linkedin.com/in/WalidAlsafadi)
+- Email: walid.k.alsafadi@gmail.com
+- GitHub: [@WalidAlsafadi](https://github.com/WalidAlsafadi)
+- Hugging Face: [@WalidAlsafadi](https://huggingface.co/WalidAlsafadi)
+- LinkedIn: [in/WalidAlsafadi](https://linkedin.com/in/WalidAlsafadi)
 
 ---
 
