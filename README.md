@@ -176,7 +176,7 @@ python -m src.transformers.arabert.inference
 Palestine-Fake-News-Detector/
 ├── main.py                      # Traditional ML pipeline entry point
 ├── requirements.txt             # Project dependencies
-├── app/                        # Modern web application
+├── webapp/                        # Modern web application
 │   ├── backend/               # Gradio ML API server
 │   │   ├── app.py            # AraBERT model integration
 │   │   ├── requirements.txt  # Backend dependencies
