@@ -5,7 +5,7 @@ __pycache__/
 *.so
 
 # Model files (large binaries)
-# models/trained/*.pkl
+models/trained/*.pkl
 models/trained/*.joblib
 models/arabert/finetuned-model/
 models/arabert/checkpoints/
@@ -26,8 +26,21 @@ outputs/*/*.zip
 .cache/
 transformers_cache/
 
-# Streamlit
-.streamlit/
+# Frontend build files
+app/frontend/.next/
+app/frontend/out/
+app/frontend/build/
+app/frontend/dist/
+app/frontend/.cache/
+
+# Node.js dependencies
+app/frontend/node_modules/
+node_modules/
+
+# Package manager lock files (keep package-lock.json for reproducible builds)
+# app/frontend/package-lock.json
+app/frontend/yarn.lock
+app/frontend/pnpm-lock.yaml
 
 # Data files (if large)
 # data/raw/*.csv

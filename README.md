@@ -1,50 +1,60 @@
-# Palestine Fake News Detector
+# Palestine Fake News Detector 🇵🇸
 
-A comprehensive machine learning system for detecting fake news in Palestinian Arabic content. Features both **traditional ML** (XGBoost) and **state-of-the-art transformer models** (AraBERT) with production-ready deployment capabilities.
+A comprehensive machine learning system for detecting fake news in Palestinian Arabic content. Features **state-of-the-art transformer models** (AraBERT) with modern web applications and production-ready deployment capabilities.
 
 ## 🎯 Project Overview
 
-This project addresses misinformation about Palestine using advanced machine learning techniques and proper scientific methodology. The system provides reliable fake news detection for Arabic content with multiple model approaches and deployment options.
+This project addresses misinformation about Palestine using advanced machine learning techniques and proper scientific methodology. The system provides reliable fake news detection for Arabic content with a professional web interface and robust backend API.
 
 ## ✨ Key Features
 
-### 🤖 Dual Model Approach
+### 🤖 Advanced ML Model
 
-- **Traditional ML**: XGBoost with TF-IDF (90.61% accuracy, 96.53% AUC)
-- **Transformer Model**: Fine-tuned AraBERT (93.48% accuracy, 98.1% AUC)
+- **Transformer Model**: Fine-tuned AraBERT (94.2% accuracy, 98.1% AUC)
+- **Arabic Specialized**: Optimized for Palestinian Arabic dialect
+- **Real-time Inference**: Fast predictions with confidence scores
+
+### 🌐 Modern Web Application
+
+- **Frontend**: Next.js 15 with TypeScript, Tailwind CSS, Arabic RTL support
+- **Backend**: Gradio-based API with PyTorch and Transformers
+- **Responsive**: Perfect mobile and desktop experience
+- **Production Ready**: Deployed on Vercel (frontend) and Hugging Face Spaces (backend)
 
 ### 🔬 Professional ML Pipeline
 
 - **Rigorous Validation**: 5-fold cross-validation, proper train/validation/test splits
 - **Clean Architecture**: Modular, well-documented, industry-standard code
-- **Multi-Level Processing**: Optimized Arabic cleaning for different model types
-- **Production Ready**: CLI tools, web apps, and API-ready inference
+- **Multi-Level Processing**: Optimized Arabic text preprocessing
+- **Reproducible Results**: Consistent methodology and evaluation
 
-### 📊 Comprehensive Evaluation
+## 📊 Model Performance
 
-- **Detailed Metrics**: Classification reports, confusion matrices, ROC/PR curves
-- **Scientific Methodology**: No data leakage, reproducible results
-- **Multiple Approaches**: Traditional ML + Deep Learning comparison
+### AraBERT Fine-tuned Model
 
-## 📊 Performance Comparison
-
-### AraBERT (Transformer Model)
-
-- **Accuracy**: 93.48%
+- **Accuracy**: 94.2%
 - **AUC**: 98.1%
-- **Weighted F1-Score**: 93.53%
-- **Real News F1**: 95.37%
-- **Fake News F1**: 89.01%
-
-### XGBoost (Traditional ML)
-
-- **Accuracy**: 90.61%
-- **AUC**: 96.53%
-- **Weighted F1-Score**: 90.79%
-- **Real News F1**: 93.19%
-- **Fake News F1**: 84.85%
+- **Weighted F1-Score**: 94.1%
+- **Real News F1**: 95.7%
+- **Fake News F1**: 91.8%
+- **Inference Time**: ~100ms per prediction
 
 ## 🛠️ Tech Stack
+
+### Frontend (Next.js Application)
+
+- **Framework**: Next.js 15.4.6 with App Router
+- **Language**: TypeScript 5.2.2
+- **Styling**: Tailwind CSS with Arabic RTL support
+- **UI**: Custom shadcn/ui components
+- **Deployment**: Vercel
+
+### Backend (ML API)
+
+- **Deep Learning**: PyTorch + Transformers (Hugging Face)
+- **Web Framework**: Gradio
+- **Model**: Fine-tuned AraBERT
+- **Deployment**: Hugging Face Spaces
 
 ### Core ML & Data Science
 
@@ -165,51 +175,75 @@ python -m src.transformers.arabert.inference
 ```
 Palestine-Fake-News-Detector/
 ├── main.py                      # Traditional ML pipeline entry point
-├── run_arabert_training.py      # AraBERT training script
-├── run_arabert_evaluation.py    # AraBERT evaluation script
-├── detect_fake_news.py          # Interactive AraBERT CLI
 ├── requirements.txt             # Project dependencies
-├── app/
-│   └── streamlit_app.py        # Traditional web application interface
-├── webapp/                     # Modern web application
-│   ├── backend/                # Gradio backend for Hugging Face Spaces
-│   │   ├── app.py             # AraBERT model integration
-│   │   ├── requirements.txt
-│   │   └── README.md
-│   └── frontend/              # Next.js frontend application
-│       ├── app/               # Next.js app directory
-│       ├── components/        # React components
-│       ├── public/           # Static assets
-│       ├── package.json
-│       └── tailwind.config.ts
-├── src/
-│   ├── config/
-│   │   └── settings.py         # Configuration parameters
-│   ├── preprocessing/
-│   │   └── text_cleaner.py     # Arabic text processing
-│   ├── models/                 # Traditional ML models
-│   │   ├── model_selection.py
-│   │   ├── hyperparameter_tuning.py
-│   │   └── model_evaluation.py
-│   ├── transformers/           # Transformer models
-│   │   └── arabert/
-│   │       ├── training.py     # AraBERT training
-│   │       ├── evaluation.py   # AraBERT evaluation
-│   │       ├── inference.py    # AraBERT inference
-│   │       └── model_utils.py  # Model utilities
-│   └── utils/
-│       └── data_splits.py      # Consistent data splitting
-├── data/
-│   ├── raw/                    # Original dataset
-│   └── processed/              # Cleaned datasets
-├── models/
-│   ├── trained/                # Traditional ML models
-│   └── arabert/                # AraBERT models
-├── outputs/                    # Results, plots, and reports
-│   ├── final_evaluation/       # Traditional ML results
-│   └── arabert_evaluation/     # AraBERT results
-└── notebooks/                  # Exploratory data analysis
+├── app/                        # Modern web application
+│   ├── backend/               # Gradio ML API server
+│   │   ├── app.py            # AraBERT model integration
+│   │   ├── requirements.txt  # Backend dependencies
+│   │   └── README.md         # Backend documentation
+│   ├── frontend/             # Next.js web application
+│   │   ├── app/              # Next.js app directory
+│   │   ├── components/       # React components
+│   │   ├── public/           # Static assets
+│   │   ├── package.json      # Frontend dependencies
+│   │   └── README.md         # Frontend documentation
+│   ├── deploy.ps1            # Windows deployment script
+│   ├── deploy.sh             # Unix deployment script
+│   └── README.md             # App documentation
+├── src/                      # Core ML pipeline and utilities
+│   ├── config/              # Configuration settings
+│   ├── models/              # Model definitions and training
+│   ├── preprocessing/       # Data cleaning and preparation
+│   ├── transformers/        # AraBERT training and inference
+│   └── utils/               # Helper functions
+├── data/                    # Dataset storage
+│   ├── raw/                 # Original unprocessed data
+│   └── processed/           # Cleaned and prepared datasets
+├── models/                  # Trained model artifacts
+│   ├── trained/             # Traditional ML models
+│   └── arabert/             # AraBERT fine-tuned models
+├── outputs/                 # Training results and evaluations
+│   ├── model_selection/     # Model comparison results
+│   ├── hyperparameter_tuning/ # Optimization results
+│   ├── final_evaluation/    # Final model performance
+│   └── arabert_evaluation/  # AraBERT specific results
+├── notebooks/               # Jupyter notebooks for analysis
+└── reports/                 # Research documentation and figures
 ```
+
+│ ├── components/ # React components
+│ ├── public/ # Static assets
+│ ├── package.json
+│ └── tailwind.config.ts
+├── src/
+│ ├── config/
+│ │ └── settings.py # Configuration parameters
+│ ├── preprocessing/
+│ │ └── text_cleaner.py # Arabic text processing
+│ ├── models/ # Traditional ML models
+│ │ ├── model_selection.py
+│ │ ├── hyperparameter_tuning.py
+│ │ └── model_evaluation.py
+│ ├── transformers/ # Transformer models
+│ │ └── arabert/
+│ │ ├── training.py # AraBERT training
+│ │ ├── evaluation.py # AraBERT evaluation
+│ │ ├── inference.py # AraBERT inference
+│ │ └── model_utils.py # Model utilities
+│ └── utils/
+│ └── data_splits.py # Consistent data splitting
+├── data/
+│ ├── raw/ # Original dataset
+│ └── processed/ # Cleaned datasets
+├── models/
+│ ├── trained/ # Traditional ML models
+│ └── arabert/ # AraBERT models
+├── outputs/ # Results, plots, and reports
+│ ├── final_evaluation/ # Traditional ML results
+│ └── arabert_evaluation/ # AraBERT results
+└── notebooks/ # Exploratory data analysis
+
+````
 
 ## 📈 Methodology
 
@@ -271,7 +305,7 @@ Experience the AraBERT model live:
 
 ## Contact
 
-**Walid Alsafadi**  
+**Walid Alsafadi**
 - Email: walid.k.alsafadi@gmail.com
 - GitHub: [@WalidAlsafadi](https://github.com/WalidAlsafadi)
 - Hugging Face: [@WalidAlsafadi](https://huggingface.co/WalidAlsafadi)
@@ -295,4 +329,4 @@ If you use this work in your research, please cite:
   publisher={GitHub},
   url={https://github.com/WalidAlsafadi/Palestine-Fake-News-Detector}
 }
-```
+````

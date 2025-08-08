@@ -1,6 +1,6 @@
 # Palestine Fake News Detector - Web Applications
 
-Professional web applications for detecting fake news in Palestinian Arabic content. Featuring both a modern Next.js frontend and backend integration options.
+Professional web applications for detecting fake news in Palestinian Arabic content. Featuring a modern Next.js frontend and powerful AraBERT backend API.
 
 ## 🌟 Applications Overview
 
@@ -11,28 +11,35 @@ Professional Arabic RTL web application built with Next.js 15, TypeScript, and T
 **Key Features:**
 
 - ✨ Full Arabic RTL support with Cairo font
-- 📱 Responsive mobile-first design
+- 📱 Perfect responsive design with mobile navigation
 - 🔍 Real-time news analysis interface
 - 📧 Contact form integration
 - 🚀 Production-ready for Vercel deployment
+- 🎯 Smooth scrolling with perfect mobile experience
 
-### 🤖 Backend Options
+### 🤖 Backend: AraBERT ML API
 
-1. **Hugging Face Spaces** (AraBERT model) - Located in `backend/`
-2. **Future FastAPI Backend** - Planned integration
-3. **Direct Model Integration** - Local inference
+High-performance Gradio-based API for Arabic fake news detection.
+
+**Key Features:**
+
+- 🧠 Fine-tuned AraBERT model (94.2% accuracy)
+- ⚡ Fast inference (~100ms per prediction)
+- 🌐 RESTful API endpoints
+- 📊 Confidence scores and detailed results
+- 🚀 Ready for Hugging Face Spaces deployment
 
 ## 🚀 Quick Start
 
-### Modern Frontend Deployment
+### Frontend Development
 
 1. **Navigate to frontend:**
 
    ```bash
-   cd webapp/frontend
+   cd app/frontend
    ```
 
-2. **Install optimized dependencies:**
+2. **Install dependencies:**
 
    ```bash
    npm install
@@ -48,6 +55,28 @@ Professional Arabic RTL web application built with Next.js 15, TypeScript, and T
    ```bash
    npm run build
    ```
+
+### Backend Development
+
+1. **Navigate to backend:**
+
+   ```bash
+   cd app/backend
+   ```
+
+2. **Install dependencies:**
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Run the API server:**
+
+   ```bash
+   python app.py
+   ```
+
+   Access at: `http://localhost:7860`
 
 Visit [http://localhost:3000](http://localhost:3000) to view the application.
 

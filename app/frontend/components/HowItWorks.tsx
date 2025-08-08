@@ -20,7 +20,10 @@ export default function HowItWorks() {
   ];
 
   return (
-    <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white">
+    <section
+      id="how-it-works"
+      className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-white scroll-mt-16"
+    >
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl sm:text-4xl font-bold text-[#2D3748] mb-4">

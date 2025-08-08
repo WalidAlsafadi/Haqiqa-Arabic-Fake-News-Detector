@@ -13,8 +13,8 @@ export default function Home() {
       <Header />
       <main className="overflow-hidden">
         <Hero />
-        <NewsAnalyzer />
         <HowItWorks />
+        <NewsAnalyzer />
         <About />
         <Developer />
         <Contact />

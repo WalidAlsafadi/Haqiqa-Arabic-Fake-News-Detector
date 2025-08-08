@@ -8,8 +8,9 @@ Modern Arabic RTL web application for detecting fake news in Palestinian content
 - **📱 Responsive Design**: Optimized for all devices and screen sizes
 - **🎨 Arabic RTL Support**: Full right-to-left layout with Cairo font
 - **✨ Modern UI/UX**: Clean, professional interface with smooth animations
-- **📧 Contact Integration**: Working contact form with Formspree
+- **📧 Contact Integration**: Working contact form with email functionality
 - **🚀 Production Ready**: Optimized for Vercel deployment
+- **🎯 Perfect Mobile Navigation**: Smooth scrolling with header offset compensation
 
 ## 🛠️ Tech Stack
 
@@ -33,7 +34,7 @@ Modern Arabic RTL web application for detecting fake news in Palestinian content
 ```bash
 # Clone the repository
 git clone https://github.com/WalidAlsafadi/Palestine-Fake-News-Detector
-cd Palestine-Fake-News-Detector/webapp/frontend
+cd Palestine-Fake-News-Detector/app/frontend
 
 # Install dependencies
 npm install

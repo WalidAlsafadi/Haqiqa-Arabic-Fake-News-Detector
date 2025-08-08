@@ -8,11 +8,15 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
     setIsMobileMenuOpen(false);
+
+    // Small delay to ensure mobile menu closes before scrolling
+    setTimeout(() => {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 100);
   };
 
   const scrollToTop = () => {
@@ -41,6 +45,12 @@ export default function Header() {
           {/* Desktop Navigation - Centered */}
           <nav className="hidden md:flex items-center gap-8 absolute left-1/2 transform -translate-x-1/2">
             <button
+              onClick={() => scrollToSection("how-it-works")}
+              className="text-gray-600 hover:text-[#799EFF] transition-colors duration-200 font-medium"
+            >
+              كيف تعمل الأداة
+            </button>
+            <button
               onClick={() => scrollToSection("analyzer")}
               className="text-gray-600 hover:text-[#799EFF] transition-colors duration-200 font-medium"
             >
@@ -50,7 +60,7 @@ export default function Header() {
               onClick={() => scrollToSection("about")}
               className="text-gray-600 hover:text-[#799EFF] transition-colors duration-200 font-medium"
             >
-              حول المشروع
+              عن المشروع
             </button>
             <button
               onClick={() => scrollToSection("developer")}
@@ -84,6 +94,12 @@ export default function Header() {
           <div className="md:hidden py-4 border-t border-gray-100">
             <nav className="flex flex-col space-y-4">
               <button
+                onClick={() => scrollToSection("how-it-works")}
+                className="text-gray-600 hover:text-[#799EFF] transition-colors duration-200 font-medium text-right py-2"
+              >
+                كيف تعمل الأداة
+              </button>
+              <button
                 onClick={() => scrollToSection("analyzer")}
                 className="text-gray-600 hover:text-[#799EFF] transition-colors duration-200 font-medium text-right py-2"
               >
@@ -93,7 +109,7 @@ export default function Header() {
                 onClick={() => scrollToSection("about")}
                 className="text-gray-600 hover:text-[#799EFF] transition-colors duration-200 font-medium text-right py-2"
               >
-                حول المشروع
+                عن المشروع
               </button>
               <button
                 onClick={() => scrollToSection("developer")}
