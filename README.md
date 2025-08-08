@@ -10,7 +10,7 @@ This project addresses misinformation about Palestine using advanced machine lea
 
 ### 🤖 Advanced ML Model
 
-- **Transformer Model**: Fine-tuned AraBERT (94.2% accuracy, 98.1% AUC)
+- **Transformer Model**: Fine-tuned AraBERT (93.4% accuracy, 98.1% AUC)
 - **Arabic Specialized**: Optimized for Palestinian Arabic dialect
 - **Real-time Inference**: Fast predictions with confidence scores
 
@@ -32,11 +32,11 @@ This project addresses misinformation about Palestine using advanced machine lea
 
 ### AraBERT Fine-tuned Model
 
-- **Accuracy**: 94.2%
+- **Accuracy**: 93.4%
 - **AUC**: 98.1%
-- **Weighted F1-Score**: 94.1%
-- **Real News F1**: 95.7%
-- **Fake News F1**: 91.8%
+- **Weighted F1-Score**: 93.5%
+- **Real News F1**: 95.3%
+- **Fake News F1**: 89%
 - **Inference Time**: ~100ms per prediction
 
 ## 🛠️ Tech Stack
@@ -209,41 +209,38 @@ Palestine-Fake-News-Detector/
 │   └── arabert_evaluation/  # AraBERT specific results
 ├── notebooks/               # Jupyter notebooks for analysis
 └── reports/                 # Research documentation and figures
-```
-
-│ ├── components/ # React components
-│ ├── public/ # Static assets
-│ ├── package.json
-│ └── tailwind.config.ts
+│   ├── components/ # React components
+│   ├── public/ # Static assets
+│   ├── package.json
+│   └── tailwind.config.ts
 ├── src/
-│ ├── config/
-│ │ └── settings.py # Configuration parameters
-│ ├── preprocessing/
-│ │ └── text_cleaner.py # Arabic text processing
-│ ├── models/ # Traditional ML models
-│ │ ├── model_selection.py
-│ │ ├── hyperparameter_tuning.py
-│ │ └── model_evaluation.py
-│ ├── transformers/ # Transformer models
-│ │ └── arabert/
-│ │ ├── training.py # AraBERT training
-│ │ ├── evaluation.py # AraBERT evaluation
-│ │ ├── inference.py # AraBERT inference
-│ │ └── model_utils.py # Model utilities
-│ └── utils/
-│ └── data_splits.py # Consistent data splitting
+│   ├── config/
+│   │   └── settings.py # Configuration parameters
+│   ├── preprocessing/
+│   │   └── text_cleaner.py # Arabic text processing
+│   ├── models/ # Traditional ML models
+│   │   ├── model_selection.py
+│   │   ├── hyperparameter_tuning.py
+│   │   └── model_evaluation.py
+│   ├── transformers/ # Transformer models
+│   │   └── arabert/
+│   │       ├── training.py # AraBERT training
+│   │       ├── evaluation.py # AraBERT evaluation
+│   │       ├── inference.py # AraBERT inference
+│   │       └── model_utils.py # Model utilities
+│   └── utils/
+│       └── data_splits.py # Consistent data splitting
 ├── data/
-│ ├── raw/ # Original dataset
-│ └── processed/ # Cleaned datasets
+│   ├── raw/ # Original dataset
+│   └── processed/ # Cleaned datasets
 ├── models/
-│ ├── trained/ # Traditional ML models
-│ └── arabert/ # AraBERT models
+│   ├── trained/ # Traditional ML models
+│   └── arabert/ # AraBERT models
 ├── outputs/ # Results, plots, and reports
-│ ├── final_evaluation/ # Traditional ML results
-│ └── arabert_evaluation/ # AraBERT results
+│   ├── final_evaluation/ # Traditional ML results
+│   └── arabert_evaluation/ # AraBERT results
 └── notebooks/ # Exploratory data analysis
-
-````
+```
 
 ## 📈 Methodology
 
@@ -264,16 +261,24 @@ This project follows ML industry best practices:
 - **Preprocessing**: Transformer-optimized Arabic cleaning
 - **Training**: 7 epochs with early stopping
 - **Test Accuracy**: 93.48%
-- **Test AUC**: 98.1%
+- **Test AUC**: 98.14%
+- **Test F1 (weighted)**: 93.53%
+- **Test F1 (macro)**: 92.19%
+- **Real News F1**: 95.37%
+- **Fake News F1**: 89.01%
 
 ### XGBoost (Traditional ML Baseline)
 
 - **Model**: XGBoost with class imbalance handling
 - **Features**: TF-IDF (5000 features, Arabic-optimized)
-- **Preprocessing**: Minimal cleaning (best performing)
-- **Cross-Validation F1**: 89.72% ± 1.82% (5-fold CV)
+- **Preprocessing**: Aggressive cleaning (best performing)
+- **Cross-Validation F1**: 89.02% ± 1.82% (5-fold CV)
 - **Test Accuracy**: 90.61%
 - **Test AUC**: 96.53%
+- **Test F1 (weighted)**: 90.79%
+- **Test F1 (macro)**: 89.02%
+- **Real News F1**: 93.19%
+- **Fake News F1**: 84.85%
 
 Both models follow proper ML validation methodology with consistent data splits and no data leakage.
 
@@ -306,6 +311,7 @@ Experience the AraBERT model live:
 ## Contact
 
 **Walid Alsafadi**
+
 - Email: walid.k.alsafadi@gmail.com
 - GitHub: [@WalidAlsafadi](https://github.com/WalidAlsafadi)
 - Hugging Face: [@WalidAlsafadi](https://huggingface.co/WalidAlsafadi)
@@ -329,4 +335,4 @@ If you use this work in your research, please cite:
   publisher={GitHub},
   url={https://github.com/WalidAlsafadi/Palestine-Fake-News-Detector}
 }
-````
+```
