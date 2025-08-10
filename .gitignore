@@ -27,20 +27,20 @@ outputs/*/*.zip
 transformers_cache/
 
 # Frontend build files
-app/frontend/.next/
-app/frontend/out/
-app/frontend/build/
-app/frontend/dist/
-app/frontend/.cache/
+webapp/frontend/.next/
+webapp/frontend/out/
+webapp/frontend/build/
+webapp/frontend/dist/
+webapp/frontend/.cache/
 
 # Node.js dependencies
-app/frontend/node_modules/
+webapp/frontend/node_modules/
 node_modules/
 
 # Package manager lock files (keep package-lock.json for reproducible builds)
-# app/frontend/package-lock.json
-app/frontend/yarn.lock
-app/frontend/pnpm-lock.yaml
+# webapp/frontend/package-lock.json
+webapp/frontend/yarn.lock
+webapp/frontend/pnpm-lock.yaml
 
 # Data files (if large)
 # data/raw/*.csv
@@ -54,8 +54,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
 parts/
 sdist/
 var/
