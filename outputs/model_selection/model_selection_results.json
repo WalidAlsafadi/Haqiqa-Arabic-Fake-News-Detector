@@ -2,81 +2,81 @@
   {
     "dataset": "minimal",
     "model": "XGBoost",
-    "cv_f1_mean": 0.8684334173386823,
-    "cv_f1_std": 0.05622696848834287,
-    "val_f1_score": 0.8841042925381231,
+    "cv_f1_mean": 0.9479712505301754,
+    "cv_f1_std": 0.005638755289271627,
+    "val_f1_score": 0.9472224865074518,
     "rank": 1
   },
   {
     "dataset": "minimal",
     "model": "SVM",
-    "cv_f1_mean": 0.8587944700935056,
-    "cv_f1_std": 0.06282294002979978,
-    "val_f1_score": 0.8970646892705926,
+    "cv_f1_mean": 0.945284317699487,
+    "cv_f1_std": 0.004572331663764126,
+    "val_f1_score": 0.9483161486103708,
     "rank": 2
   },
   {
     "dataset": "minimal",
     "model": "Random Forest",
-    "cv_f1_mean": 0.8498837597898042,
-    "cv_f1_std": 0.07542608630295047,
-    "val_f1_score": 0.887716016933221,
+    "cv_f1_mean": 0.943366625806024,
+    "cv_f1_std": 0.0048864475512641215,
+    "val_f1_score": 0.9432485960300915,
     "rank": 3
   },
   {
     "dataset": "minimal",
-    "model": "Naive Bayes",
-    "cv_f1_mean": 0.8457417630556296,
-    "cv_f1_std": 0.06024372111828387,
-    "val_f1_score": 0.8651587814374663,
+    "model": "Logistic Regression",
+    "cv_f1_mean": 0.9427531462361562,
+    "cv_f1_std": 0.004703295488697669,
+    "val_f1_score": 0.9461526223875714,
     "rank": 4
   },
   {
     "dataset": "minimal",
-    "model": "Logistic Regression",
-    "cv_f1_mean": 0.8334891408641069,
-    "cv_f1_std": 0.07020792653681153,
-    "val_f1_score": 0.8693347422181129,
+    "model": "Naive Bayes",
+    "cv_f1_mean": 0.9176577718981809,
+    "cv_f1_std": 0.004400575294015589,
+    "val_f1_score": 0.9226293140156636,
     "rank": 5
   },
   {
     "dataset": "aggressive",
     "model": "XGBoost",
-    "cv_f1_mean": 0.8697471558348928,
-    "cv_f1_std": 0.06409682433898214,
-    "val_f1_score": 0.8929550718573527,
+    "cv_f1_mean": 0.9444404488804163,
+    "cv_f1_std": 0.004996117422451644,
+    "val_f1_score": 0.9508718906310519,
     "rank": 1
   },
   {
     "dataset": "aggressive",
     "model": "SVM",
-    "cv_f1_mean": 0.8593887738553564,
-    "cv_f1_std": 0.06549044485814777,
-    "val_f1_score": 0.8923857019367175,
+    "cv_f1_mean": 0.9425955005582637,
+    "cv_f1_std": 0.003932448725707244,
+    "val_f1_score": 0.9468602654726348,
     "rank": 2
   },
   {
     "dataset": "aggressive",
     "model": "Random Forest",
-    "cv_f1_mean": 0.8536297102606625,
-    "cv_f1_std": 0.07153087473184755,
-    "val_f1_score": 0.8930411710789384,
+    "cv_f1_mean": 0.9421547737115106,
+    "cv_f1_std": 0.004988533397046771,
+    "val_f1_score": 0.9399828958166517,
     "rank": 3
   },
   {
     "dataset": "aggressive",
-    "model": "Naive Bayes",
-    "cv_f1_mean": 0.8450280423871931,
-    "cv_f1_std": 0.05971065988366745,
-    "val_f1_score": 0.861658170353719,
+    "model": "Logistic Regression",
+    "cv_f1_mean": 0.9406911102930975,
+    "cv_f1_std": 0.004975929011453084,
+    "val_f1_score": 0.9450561438894631,
     "rank": 4
   },
   {
     "dataset": "aggressive",
-    "model": "Logistic Regression",
-    "cv_f1_mean": 0.8325214019769642,
-    "cv_f1_std": 0.07439114219218908,
-    "val_f1_score": 0.8662145926951828,
+    "model": "Naive Bayes",
+    "cv_f1_mean": 0.9152368607626912,
+    "cv_f1_std": 0.005653286227872462,
+    "val_f1_score": 0.9171822534369337,
     "rank": 5
   }
 ]

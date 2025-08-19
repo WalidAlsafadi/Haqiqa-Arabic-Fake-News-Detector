@@ -15,26 +15,37 @@ from pathlib import Path
 def _show_config():
     """Display current configuration settings"""
     from src.config.settings import (
-        DATASET_PATH, RANDOM_STATE, CV_FOLDS, 
-        TFIDF_MAX_FEATURES, TFIDF_MIN_DF, TFIDF_MAX_DF
+        UCAS_NLP_COURSE_DATASET_PATH, ARABIC_NEWS_VERIFICATION_DATASET_PATH, 
+        RANDOM_STATE, CV_FOLDS, TFIDF_MAX_FEATURES, TFIDF_MIN_DF, TFIDF_MAX_DF,
+        ARABERT_MODEL_NAME, ARABERT_EPOCHS, ARABERT_BATCH_SIZE
     )
     
     print("CURRENT CONFIGURATION")
     print("-" * 30)
-    print(f"Dataset Path: {DATASET_PATH}")
+    print(f"UCAS NLP Course Dataset: {UCAS_NLP_COURSE_DATASET_PATH}")
+    print(f"Arabic News Verification Dataset: {ARABIC_NEWS_VERIFICATION_DATASET_PATH}")
     print(f"Random State: {RANDOM_STATE}")
     print(f"CV Folds: {CV_FOLDS}")
     print(f"TF-IDF Max Features: {TFIDF_MAX_FEATURES}")
     print(f"TF-IDF Min DF: {TFIDF_MIN_DF}")
     print(f"TF-IDF Max DF: {TFIDF_MAX_DF}")
+    print()
+    print("AraBERT Configuration:")
+    print(f"  Model: {ARABERT_MODEL_NAME}")
+    print(f"  Epochs: {ARABERT_EPOCHS}")
+    print(f"  Batch Size: {ARABERT_BATCH_SIZE}")
 
 
 def _show_pipeline_info():
     """Display pipeline overview and structure"""
+    # First show dataset information
+    from src.config.settings import print_dataset_info
+    print_dataset_info()
+    
     print("PIPELINE OVERVIEW")
     print("-" * 30)
     print("1. Data Preparation:")
-    print("   - Load raw dataset")
+    print("   - Load raw datasets (UCAS NLP Course 2025 + Arabic News Verification)")
     print("   - Apply 3 text cleaning approaches (minimal, aggressive, transformers)")
     print("   - Create consistent train/validation/test splits (60/20/20)")
     print("   - Save 3 separate CSV files for flexibility:")
@@ -65,45 +76,43 @@ def _show_pipeline_info():
 
 def _run_data_preparation():
     """Run data preparation phase"""
-    from src.preprocessing.text_cleaner import prepare_data
-    from src.config.settings import DATASET_PATH
+    from src.preprocessing.data_preparation import prepare_modern_dataset, create_separate_datasets
     from src.utils.data_splits import DataSplitter
-    
+    from src.config.settings import (
+        UCAS_NLP_COURSE_DATASET_PATH, ARABIC_NEWS_VERIFICATION_DATASET_PATH,
+        MINIMAL_DATASET_PATH, AGGRESSIVE_DATASET_PATH, TRANSFORMERS_DATASET_PATH,
+        PROCESSED_DATA_DIR, ensure_dir_exists
+    )
+
     print("\nSTARTING DATA PREPARATION")
     print("=" * 50)
-    
-    # Load and clean data
-    print(f"Loading dataset from: {DATASET_PATH}")
-    df = prepare_data(DATASET_PATH)
+
+    # Load and clean data using new approach (UCAS + Arabic News Verification)
+    df = prepare_modern_dataset(
+        ucas_path=UCAS_NLP_COURSE_DATASET_PATH,
+        kaggle_path=ARABIC_NEWS_VERIFICATION_DATASET_PATH
+    )
     print(f"Data prepared: {len(df)} samples")
-    
+
     # Create data splits (for consistent indices across all datasets)
     print("Creating train/validation/test splits (60/20/20)")
     splitter = DataSplitter()
     splitter.create_splits(df)
-    
+
     # Save separate CSV files for flexibility and framework compatibility
     print("Saving separate datasets for different approaches")
-    os.makedirs("data/processed", exist_ok=True)
-    
-    # 1. Minimal cleaning - for quick traditional ML experiments
-    minimal_df = df[['text_minimal', 'label']].copy()
-    minimal_df = minimal_df.rename(columns={'text_minimal': 'text'})
-    minimal_df.to_csv("data/processed/minimal_cleaned.csv", index=False)
-    print(f"  - Minimal dataset: {len(minimal_df)} samples → data/processed/minimal_cleaned.csv")
-    
-    # 2. Aggressive cleaning - for robust traditional ML
-    aggressive_df = df[['text_aggressive', 'label']].copy()
-    aggressive_df = aggressive_df.rename(columns={'text_aggressive': 'text'})
-    aggressive_df.to_csv("data/processed/aggressive_cleaned.csv", index=False)
-    print(f"  - Aggressive dataset: {len(aggressive_df)} samples → data/processed/aggressive_cleaned.csv")
-    
-    # 3. Transformers ready - for AraBERT fine-tuning
-    transformers_df = df[['text_transformers', 'label']].copy()
-    transformers_df = transformers_df.rename(columns={'text_transformers': 'text'})
-    transformers_df.to_csv("data/processed/transformers_cleaned.csv", index=False)
-    print(f"  - Transformers dataset: {len(transformers_df)} samples → data/processed/transformers_cleaned.csv")
-    
+    ensure_dir_exists(PROCESSED_DATA_DIR)
+
+    minimal_df, aggressive_df, transformers_df = create_separate_datasets(df)
+    minimal_df.to_csv(MINIMAL_DATASET_PATH, index=False)
+    print(f"  - Minimal dataset: {len(minimal_df)} samples → {MINIMAL_DATASET_PATH}")
+
+    aggressive_df.to_csv(AGGRESSIVE_DATASET_PATH, index=False)
+    print(f"  - Aggressive dataset: {len(aggressive_df)} samples → {AGGRESSIVE_DATASET_PATH}")
+
+    transformers_df.to_csv(TRANSFORMERS_DATASET_PATH, index=False)
+    print(f"  - Transformers dataset: {len(transformers_df)} samples → {TRANSFORMERS_DATASET_PATH}")
+
     print("Data preparation completed successfully")
     print("All datasets use consistent train/val/test splits via saved indices")
     return df, splitter
@@ -111,14 +120,15 @@ def _run_data_preparation():
 
 def _run_model_selection(splitter):
     """Run model selection phase with cross-validation"""
-    from src.models.model_selection import compare_models
+    from src.ml_algorithms.model_selection import compare_models
+    from src.config.settings import MODEL_SELECTION_OUTPUT_DIR, ensure_dir_exists
     
     # Create output directory
-    os.makedirs("outputs/model_selection", exist_ok=True)
+    ensure_dir_exists(MODEL_SELECTION_OUTPUT_DIR)
     
     # Compare models using cross-validation
     results = compare_models(splitter, dataset_names=['minimal', 'aggressive'], 
-                           output_dir="outputs/model_selection")
+                           output_dir=MODEL_SELECTION_OUTPUT_DIR)
     
     if not results:
         print("Model selection failed")
@@ -130,7 +140,7 @@ def _run_model_selection(splitter):
 
 def _run_hyperparameter_tuning(splitter):
     """Run hyperparameter tuning phase"""
-    from src.models.hyperparameter_tuning import tune_best_model
+    from src.ml_algorithms.hyperparameter_tuning import tune_best_model
     
     # Tune the best model
     result = tune_best_model(splitter)
@@ -146,7 +156,7 @@ def _run_hyperparameter_tuning(splitter):
 
 def _run_final_evaluation(splitter):
     """Run final evaluation phase"""
-    from src.models.model_evaluation import evaluate_final_model
+    from src.ml_algorithms.model_evaluation import evaluate_final_model
     
     # Evaluate on test set
     results = evaluate_final_model(splitter)

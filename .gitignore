@@ -4,13 +4,12 @@ __pycache__/
 *$py.class
 *.so
 
-# Model files (large binaries)
-models/trained/*.pkl
-models/trained/*.joblib
-models/arabert/finetuned-model/
-models/arabert/checkpoints/
-!models/trained/.gitkeep
-!models/arabert/.gitkeep
+# Model files (large binaries) - but keep best_model.pkl for quick start
+saved_models/traditional/*.pkl
+!saved_models/traditional/best_model.pkl
+saved_models/arabert/
+!saved_models/traditional/.gitkeep
+!saved_models/arabert/.gitkeep
 
 # Output files
 outputs/*/logs/
@@ -184,4 +183,4 @@ config/secrets.json
 *.pem
 
 # Fine-tuning models
-models/arabert/finetuned-model/
+saved_models/arabert/

@@ -1,3 +1,19 @@
+"""
+Data Splitting Utilities for Palestine Fake News Detection
+
+Provides consistent, stratified train/validation/test splits across all datasets.
+Ensures reproducible results and proper class balance in all splits.
+
+Features:
+- Stratified splitting to maintain class balance
+- Configurable split ratios (default: 60/20/20)
+- Index persistence for consistent splits across datasets
+- Comprehensive split information and statistics
+
+Author: Palestine Fake News Detection Team  
+Created: 2025
+"""
+
 import os
 import pickle
 import pandas as pd
@@ -64,25 +80,25 @@ class DataSplitter:
         if save_splits:
             self._save_splits()
     
-    def get_train(self, df, text_column='text_minimal', target='label'):
+    def get_train(self, df, text_column='content', target='label'):
         """Get training data for specified text column"""
         self._check_splits_exist()
         return (df[text_column].iloc[self.train_indices].reset_index(drop=True),
                 df[target].iloc[self.train_indices].reset_index(drop=True))
     
-    def get_val(self, df, text_column='text_minimal', target='label'):
+    def get_val(self, df, text_column='content', target='label'):
         """Get validation data for specified text column"""
         self._check_splits_exist()
         return (df[text_column].iloc[self.val_indices].reset_index(drop=True),
                 df[target].iloc[self.val_indices].reset_index(drop=True))
     
-    def get_test(self, df, text_column='text_minimal', target='label'):
+    def get_test(self, df, text_column='content', target='label'):
         """Get test data for specified text column (use only for final evaluation!)"""
         self._check_splits_exist()
         return (df[text_column].iloc[self.test_indices].reset_index(drop=True),
                 df[target].iloc[self.test_indices].reset_index(drop=True))
     
-    def get_train_val(self, df, text_column='text_minimal', target='label'):
+    def get_train_val(self, df, text_column='content', target='label'):
         """Get combined train+validation data (useful for cross-validation)"""
         self._check_splits_exist()
         combined_indices = sorted(self.train_indices + self.val_indices)
@@ -94,30 +110,34 @@ class DataSplitter:
         """Get training data from CSV file using saved indices"""
         self._check_splits_exist()
         df = pd.read_csv(csv_path)
+        df[text_column] = df[text_column].fillna("").astype(str)
         return (df[text_column].iloc[self.train_indices].reset_index(drop=True),
-                df[target].iloc[self.train_indices].reset_index(drop=True))
+            df[target].iloc[self.train_indices].reset_index(drop=True))
     
     def get_val_from_csv(self, csv_path, text_column='text', target='label'):
         """Get validation data from CSV file using saved indices"""
         self._check_splits_exist()
         df = pd.read_csv(csv_path)
+        df[text_column] = df[text_column].fillna("").astype(str)
         return (df[text_column].iloc[self.val_indices].reset_index(drop=True),
-                df[target].iloc[self.val_indices].reset_index(drop=True))
+            df[target].iloc[self.val_indices].reset_index(drop=True))
     
     def get_test_from_csv(self, csv_path, text_column='text', target='label'):
         """Get test data from CSV file using saved indices (use only for final evaluation!)"""
         self._check_splits_exist()
         df = pd.read_csv(csv_path)
+        df[text_column] = df[text_column].fillna("").astype(str)
         return (df[text_column].iloc[self.test_indices].reset_index(drop=True),
-                df[target].iloc[self.test_indices].reset_index(drop=True))
+            df[target].iloc[self.test_indices].reset_index(drop=True))
     
     def get_train_val_from_csv(self, csv_path, text_column='text', target='label'):
         """Get combined train+validation data from CSV file using saved indices"""
         self._check_splits_exist()
         df = pd.read_csv(csv_path)
+        df[text_column] = df[text_column].fillna("").astype(str)
         combined_indices = sorted(self.train_indices + self.val_indices)
         return (df[text_column].iloc[combined_indices].reset_index(drop=True),
-                df[target].iloc[combined_indices].reset_index(drop=True))
+            df[target].iloc[combined_indices].reset_index(drop=True))
     
     def _check_splits_exist(self):
         """Check if splits have been created"""
@@ -126,7 +146,8 @@ class DataSplitter:
     
     def _save_splits(self):
         """Save split indices to disk for consistency"""
-        os.makedirs("data/processed/splits", exist_ok=True)
+        from src.config.settings import SPLITS_DIR
+        os.makedirs(SPLITS_DIR, exist_ok=True)
         
         split_data = {
             'train_indices': self.train_indices,
@@ -138,14 +159,16 @@ class DataSplitter:
             'random_state': self.random_state
         }
         
-        with open("data/processed/splits/split_indices.pkl", 'wb') as f:
+        split_file_path = os.path.join(SPLITS_DIR, "split_indices.pkl")
+        with open(split_file_path, 'wb') as f:
             pickle.dump(split_data, f)
-        print("Split indices saved to data/processed/splits/split_indices.pkl")
+        print(f"Split indices saved to {split_file_path}")
     
     @classmethod
     def load_splits(cls):
         """Load previously saved split indices"""
-        splits_file = "data/processed/splits/split_indices.pkl"
+        from src.config.settings import SPLITS_DIR
+        splits_file = os.path.join(SPLITS_DIR, "split_indices.pkl")
         
         if not os.path.exists(splits_file):
             print("No saved split indices found")

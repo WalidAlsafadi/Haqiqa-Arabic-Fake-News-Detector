@@ -225,7 +225,9 @@ def train_arabert_model(
 
 if __name__ == "__main__":
     # Example usage
+    from src.config.settings import TRANSFORMERS_DATASET_PATH, ARABERT_MODEL_PATH
+    
     train_arabert_model(
-        data_path="data/processed/transformers_cleaned.csv",
-        output_dir="models/arabert/finetuned-model"
+        data_path=TRANSFORMERS_DATASET_PATH,
+        output_dir=ARABERT_MODEL_PATH
     )

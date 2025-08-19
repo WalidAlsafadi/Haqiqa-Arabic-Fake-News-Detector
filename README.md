@@ -1,341 +1,139 @@
-# Palestine Fake News Detector 🇵🇸
+# Haqiqa - Arabic Fake News Detector
 
-A comprehensive machine learning system for detecting fake news in Palestinian Arabic content. Features **state-of-the-art transformer models** (AraBERT) with modern web applications and production-ready deployment capabilities.
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![AraBERT](https://img.shields.io/badge/AraBERT-96.22%25%20F1-orange.svg)](https://huggingface.co/aubmindlab/bert-base-arabertv02)
+[![XGBoost](https://img.shields.io/badge/XGBoost-94.50%25%20F1-green.svg)](https://xgboost.readthedocs.io/)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
-## 🎯 Project Overview
+**Haqiqa** (حقيقة - "Truth") is a production-ready system for detecting fake news in Arabic content. Features state-of-the-art **AraBERT (96.22% F1)** and **XGBoost (94.50% F1)** models with comprehensive evaluation on 13,750 verified samples.
 
-This project addresses misinformation about Palestine using advanced machine learning techniques and proper scientific methodology. The system provides reliable fake news detection for Arabic content with a professional web interface and robust backend API.
+## 🏆 Performance Results
 
-## ✨ Key Features
-
-### 🤖 Advanced ML Model
-
-- **Transformer Model**: Fine-tuned AraBERT (93.4% accuracy, 98.1% AUC)
-- **Arabic Specialized**: Optimized for Palestinian Arabic dialect
-- **Real-time Inference**: Fast predictions with confidence scores
-
-### 🌐 Modern Web Application
-
-- **Frontend**: Next.js 15 with TypeScript, Tailwind CSS, Arabic RTL support
-- **Backend**: Gradio-based API with PyTorch and Transformers
-- **Responsive**: Perfect mobile and desktop experience
-- **Production Ready**: Deployed on Vercel (frontend) and Hugging Face Spaces (backend)
-
-### 🔬 Professional ML Pipeline
-
-- **Rigorous Validation**: 5-fold cross-validation, proper train/validation/test splits
-- **Clean Architecture**: Modular, well-documented, industry-standard code
-- **Multi-Level Processing**: Optimized Arabic text preprocessing
-- **Reproducible Results**: Consistent methodology and evaluation
-
-## 📊 Model Performance
-
-### AraBERT Fine-tuned Model
-
-- **Accuracy**: 93.4%
-- **AUC**: 98.1%
-- **Weighted F1-Score**: 93.5%
-- **Real News F1**: 95.3%
-- **Fake News F1**: 89%
-- **Inference Time**: ~100ms per prediction
-
-## 🛠️ Tech Stack
-
-### Frontend (Next.js Application)
-
-- **Framework**: Next.js 15.4.6 with App Router
-- **Language**: TypeScript 5.2.2
-- **Styling**: Tailwind CSS with Arabic RTL support
-- **UI**: Custom shadcn/ui components
-- **Deployment**: Vercel
-
-### Backend (ML API)
-
-- **Deep Learning**: PyTorch + Transformers (Hugging Face)
-- **Web Framework**: Gradio
-- **Model**: Fine-tuned AraBERT
-- **Deployment**: Hugging Face Spaces
-
-### Core ML & Data Science
-
-- **Python 3.12** - Core programming language
-- **Scikit-learn** - Traditional ML framework
-- **XGBoost** - High-performance gradient boosting
-- **Pandas/NumPy** - Data manipulation
-
-### Deep Learning & Transformers
-
-- **PyTorch** - Deep learning framework
-- **Transformers** - Hugging Face transformer models
-- **AraBERT** - Arabic BERT model (aubmindlab/bert-base-arabertv02)
-- **Datasets** - Efficient data loading
-
-### Arabic NLP
-
-- **NLTK** - Arabic text processing
-- **Arabic-Stopwords** - Arabic stopword removal
-- **Sentencepiece** - Subword tokenization
-
-### Deployment & Visualization
-
-- **Next.js + Tailwind** - Modern web application framework
-- **Streamlit** - Traditional web application framework
-- **Matplotlib/Seaborn** - Visualization
-- **Joblib** - Model persistence
-- **Gradio** - Hugging Face Space deployment
+| Model       | F1-Score   | Accuracy   | AUC        | Inference  |
+| ----------- | ---------- | ---------- | ---------- | ---------- |
+| **AraBERT** | **96.22%** | **96.22%** | **99.57%** | **~200ms** |
+| **XGBoost** | **94.50%** | **94.51%** | **98.94%** | **<50ms**  |
 
 ## 🚀 Quick Start
 
-### Installation
-
+### Option 1: Pre-trained Models (Recommended)
 ```bash
-# Clone repository
-git clone https://github.com/WalidAlsafadi/Palestine-Fake-News-Detector
+# Clone and setup
+git clone https://github.com/WalidAlsafadi/Palestine-Fake-News-Detector.git
 cd Palestine-Fake-News-Detector
-
-# Create virtual environment (recommended)
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# Install dependencies
 pip install -r requirements.txt
+
+# Immediate testing with pre-trained XGBoost model
+python inference.py
+# Choose option 1 (XGBoost) - ready to use!
 ```
 
-### Usage
-
-#### Traditional ML Pipeline (XGBoost)
-
+### Option 2: Complete Training Pipeline
 ```bash
-# Run complete ML pipeline
-python main.py --all
+# Train your own models from scratch
+python main.py --data-prep              # Data preparation  
+python main.py --model-selection        # Compare 5 ML algorithms
+python main.py --hyperparameter-tuning  # Optimize best model
+python main.py --final-evaluation       # Test set evaluation
 
-# Individual components
-python main.py --data-prep
-python main.py --model-selection
-python main.py --tuning
-python main.py --evaluation
+# Then test with your trained models
+python inference.py
 ```
 
-#### AraBERT (Transformer Model)
+## 📊 Dataset & Methodology
 
-```bash
-# Train AraBERT model
-python run_arabert_training.py
+- **Size**: 13,750 Arabic news samples
+- **Sources**: UCAS academic dataset + Kaggle Arabic verification data
+- **Distribution**: 60% train (8,250) | 20% validation (2,750) | 20% test (2,750)
+- **Balance**: 46.6% real news, 53.4% fake news
+- **Evaluation**: Stratified splits, 5-fold cross-validation, held-out test set
 
-# Evaluate AraBERT model
-python run_arabert_evaluation.py
+## 🛠️ Architecture
 
-# Interactive fake news detection
-python detect_fake_news.py
-```
+### Core Components
 
-#### Web Applications
+- **Text Processing**: 3 cleaning strategies (minimal/aggressive/transformers)
+- **ML Pipeline**: Model selection → Hyperparameter tuning → Evaluation
+- **Models**: XGBoost, SVM, Random Forest, Logistic Regression, Naive Bayes
+- **Deep Learning**: Fine-tuned AraBERT for Arabic text classification
+- **Inference**: Smart model loading and comparison interface
 
-**حقيقة (Haqiqa) - Modern Arabic Web App**
+### Technical Stack
 
-Professional Arabic RTL web application for Palestine fake news detection.
-
-```bash
-# Navigate to modern frontend
-cd webapp/frontend
-
-# Install optimized dependencies
-npm install
-
-# Run development server
-npm run dev
-
-# Build for production deployment
-npm run build
-```
-
-Visit `http://localhost:3000`
-
-**Features:**
-
-- ✨ Full Arabic RTL support with Cairo font
-- 🎨 Modern responsive design with Tailwind CSS
-- 📱 Mobile-optimized interface
-- 🔍 Real-time news analysis
-- 📧 Contact form integration
-- 🚀 Production-ready for Vercel deployment
-
-**Traditional Streamlit App**
-
-```bash
-# Traditional ML web app
-streamlit run app/streamlit_app.py
-
-# AraBERT inference (coming soon)
-python -m src.transformers.arabert.inference
-```
+- **ML**: Scikit-learn, XGBoost, PyTorch, Transformers (HuggingFace)
+- **NLP**: NLTK, Arabic-Stopwords, custom Arabic normalization
+- **Web**: Next.js frontend, Gradio API backend
+- **Data**: Pandas, NumPy, stratified sampling
 
 ## 📁 Project Structure
 
 ```
 Palestine-Fake-News-Detector/
-├── main.py                      # Traditional ML pipeline entry point
-├── requirements.txt             # Project dependencies
-├── webapp/                        # Modern web application
-│   ├── backend/               # Gradio ML API server
-│   │   ├── app.py            # AraBERT model integration
-│   │   ├── requirements.txt  # Backend dependencies
-│   │   └── README.md         # Backend documentation
-│   ├── frontend/             # Next.js web application
-│   │   ├── app/              # Next.js app directory
-│   │   ├── components/       # React components
-│   │   ├── public/           # Static assets
-│   │   ├── package.json      # Frontend dependencies
-│   │   └── README.md         # Frontend documentation
-│   ├── deploy.ps1            # Windows deployment script
-│   ├── deploy.sh             # Unix deployment script
-│   └── README.md             # App documentation
-├── src/                      # Core ML pipeline and utilities
-│   ├── config/              # Configuration settings
-│   ├── models/              # Model definitions and training
-│   ├── preprocessing/       # Data cleaning and preparation
-│   ├── transformers/        # AraBERT training and inference
-│   └── utils/               # Helper functions
-├── data/                    # Dataset storage
-│   ├── raw/                 # Original unprocessed data
-│   └── processed/           # Cleaned and prepared datasets
-├── models/                  # Trained model artifacts
-│   ├── trained/             # Traditional ML models
-│   └── arabert/             # AraBERT fine-tuned models
-├── outputs/                 # Training results and evaluations
-│   ├── model_selection/     # Model comparison results
-│   ├── hyperparameter_tuning/ # Optimization results
-│   ├── final_evaluation/    # Final model performance
-│   └── arabert_evaluation/  # AraBERT specific results
-├── notebooks/               # Jupyter notebooks for analysis
-└── reports/                 # Research documentation and figures
-```
-
-```
-│   ├── components/ # React components
-│   ├── public/ # Static assets
-│   ├── package.json
-│   └── tailwind.config.ts
+├── inference.py              # Smart model selection & testing
+├── main.py                   # Complete ML pipeline
 ├── src/
-│   ├── config/
-│   │   └── settings.py # Configuration parameters
-│   ├── preprocessing/
-│   │   └── text_cleaner.py # Arabic text processing
-│   ├── models/ # Traditional ML models
-│   │   ├── model_selection.py
-│   │   ├── hyperparameter_tuning.py
-│   │   └── model_evaluation.py
-│   ├── transformers/ # Transformer models
-│   │   └── arabert/
-│   │       ├── training.py # AraBERT training
-│   │       ├── evaluation.py # AraBERT evaluation
-│   │       ├── inference.py # AraBERT inference
-│   │       └── model_utils.py # Model utilities
-│   └── utils/
-│       └── data_splits.py # Consistent data splitting
-├── data/
-│   ├── raw/ # Original dataset
-│   └── processed/ # Cleaned datasets
-├── models/
-│   ├── trained/ # Traditional ML models
-│   └── arabert/ # AraBERT models
-├── outputs/ # Results, plots, and reports
-│   ├── final_evaluation/ # Traditional ML results
-│   └── arabert_evaluation/ # AraBERT results
-└── notebooks/ # Exploratory data analysis
+│   ├── config/settings.py    # Centralized configuration
+│   ├── preprocessing/        # Arabic text cleaning
+│   ├── ml_algorithms/        # Model selection, tuning, evaluation
+│   ├── transformers/arabert/ # AraBERT training & evaluation
+│   └── utils/data_splits.py  # Consistent data splitting
+├── data/processed/           # Clean datasets (13,750 samples)
+├── saved_models/             # Trained models (XGBoost + AraBERT)
+├── outputs/                  # Results, metrics, visualizations
+└── webapp/                   # Web interface (Haqiqa brand)
 ```
 
-## 📈 Methodology
+## 🔧 Advanced Usage
 
-This project follows ML industry best practices:
+### Adding Your Own Dataset
+Want to test Haqiqa on your Arabic news dataset? Your CSV needs `text` and `label` columns (0=Real, 1=Fake):
 
-1. **Proper Data Splitting**: Consistent 60/20/20 train/validation/test splits
-2. **Cross-Validation**: 5-fold CV on training data for model selection
-3. **No Data Leakage**: TF-IDF fitted only on training data
-4. **Validation Tuning**: Hyperparameters optimized on validation set
-5. **Unbiased Testing**: Final evaluation on held-out test set
-6. **Reproducible Results**: Fixed random seeds and saved artifacts
+```python
+# Add your dataset to the pipeline
+from src.config.settings import DATASET_PATHS
+DATASET_PATHS['my_dataset'] = 'data/processed/my_dataset.csv'
 
-## 🎯 Results Summary
+# Run evaluation
+python main.py --model-selection  # Test on your data
+```
 
-### AraBERT (State-of-the-Art)
+### Using Haqiqa in Your Projects  
+Want to integrate Haqiqa's trained model into your own application?
 
-- **Model**: Fine-tuned AraBERT (aubmindlab/bert-base-arabertv02)
-- **Preprocessing**: Transformer-optimized Arabic cleaning
-- **Training**: 7 epochs with early stopping
-- **Test Accuracy**: 93.48%
-- **Test AUC**: 98.14%
-- **Test F1 (weighted)**: 93.53%
-- **Test F1 (macro)**: 92.19%
-- **Real News F1**: 95.37%
-- **Fake News F1**: 89.01%
+```python
+from src.ml_algorithms.model_selection import load_best_pipeline
+pipeline, results = load_best_pipeline()
 
-### XGBoost (Traditional ML Baseline)
+def detect_fake_news(arabic_text):
+    prediction = pipeline.predict([arabic_text])[0]
+    confidence = pipeline.predict_proba([arabic_text])[0].max()
+    return "Fake" if prediction == 1 else "Real", confidence
 
-- **Model**: XGBoost with class imbalance handling
-- **Features**: TF-IDF (5000 features, Arabic-optimized)
-- **Preprocessing**: Aggressive cleaning (best performing)
-- **Cross-Validation F1**: 89.02% ± 1.82% (5-fold CV)
-- **Test Accuracy**: 90.61%
-- **Test AUC**: 96.53%
-- **Test F1 (weighted)**: 90.79%
-- **Test F1 (macro)**: 89.02%
-- **Real News F1**: 93.19%
-- **Fake News F1**: 84.85%
+# Usage example
+result, confidence = detect_fake_news("خبر عاجل من فلسطين...")
+print(f"This news is {result} (confidence: {confidence:.2%})")
+```
 
-Both models follow proper ML validation methodology with consistent data splits and no data leakage.
+### Web Interface
+```bash
+# Run the modern Arabic web interface (Haqiqa brand)
+cd webapp/frontend && npm install && npm run dev
+# Access at http://localhost:3000
+```
 
-## 🚀 Live Demo & Deployment
+## 📄 License & Contact
 
-### Frontend Demo
+**Licensed under Apache 2.0** - see [LICENSE](LICENSE) for details.
 
-The modern web application is ready for deployment and features:
+**Author**: Walid Alsafadi | **GitHub**: [@WalidAlsafadi](https://github.com/WalidAlsafadi)
 
-- **Portfolio-ready design** with Arabic RTL support
-- **Real-time AraBERT integration** via Hugging Face Spaces
-- **Responsive interface** optimized for all devices
-- **Professional UI/UX** with modern design patterns
+## 🙏 Acknowledgments
 
-### Hugging Face Space
-
-Experience the AraBERT model live:
-
-- **Model:** [walidalsafadi/arabert-fake-news-detector](https://huggingface.co/spaces/walidalsafadi/arabert-fake-news-detector)
-- **API:** Available for real-time predictions
-- **Performance:** 93.48% accuracy on Palestinian Arabic news
-
-### Deployment Options
-
-1. **Vercel/Netlify** - Frontend deployment
-2. **Hugging Face Spaces** - Model hosting (already deployed)
-3. **Docker** - Complete containerized deployment
-4. **Traditional hosting** - Via build output
-
-## Contact
-
-**Walid Alsafadi**
-
-- Email: walid.k.alsafadi@gmail.com
-- GitHub: [@WalidAlsafadi](https://github.com/WalidAlsafadi)
-- Hugging Face: [@WalidAlsafadi](https://huggingface.co/WalidAlsafadi)
-- LinkedIn: [in/WalidAlsafadi](https://linkedin.com/in/WalidAlsafadi)
+- **Dr. Tareq Altalmas** - UCAS NLP Course supervision
+- **aubmindlab** - AraBERT Arabic BERT model
+- **HuggingFace** - Transformers library and model hosting
+- **UCAS Students** - Dataset collection and annotation
 
 ---
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Citation
-
-If you use this work in your research, please cite:
-
-```bibtex
-@misc{alsafadi2025palestine,
-  title={Palestinian Fake News Detection Using Machine Learning},
-  author={Alsafadi, Walid},
-  year={2025},
-  publisher={GitHub},
-  url={https://github.com/WalidAlsafadi/Palestine-Fake-News-Detector}
-}
-```
+**Haqiqa (حقيقة)** - Bringing truth to Arabic news through AI. ⭐ _Star this repo if it helps your work!_

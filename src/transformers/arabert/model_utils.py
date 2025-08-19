@@ -155,15 +155,15 @@ if __name__ == "__main__":
         print(f"  {key}: {value}")
     
     # Check if model exists
-    model_path = "models/arabert/finetuned-model"
-    if os.path.exists(model_path):
-        model_info = get_model_info(model_path)
+    from src.config.settings import ARABERT_MODEL_PATH
+    if os.path.exists(ARABERT_MODEL_PATH):
+        model_info = get_model_info(ARABERT_MODEL_PATH)
         print(f"\nModel Information:")
         for key, value in model_info.items():
             print(f"  {key}: {value}")
         
         # Verify compatibility
-        is_compatible = verify_model_compatibility(model_path)
+        is_compatible = verify_model_compatibility(ARABERT_MODEL_PATH)
         print(f"\nModel compatibility: {'✅ Compatible' if is_compatible else '❌ Not compatible'}")
     else:
-        print(f"\nModel not found at: {model_path}")
+        print(f"\nModel not found at: {ARABERT_MODEL_PATH}")

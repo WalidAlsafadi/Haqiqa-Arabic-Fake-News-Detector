@@ -284,8 +284,10 @@ def evaluate_arabert_model(
 
 if __name__ == "__main__":
     # Example usage
+    from src.config.settings import ARABERT_MODEL_PATH, TRANSFORMERS_DATASET_PATH, ARABERT_EVALUATION_OUTPUT_DIR
+    
     evaluate_arabert_model(
-        model_path="models/arabert/finetuned-model",
-        data_path="data/processed/transformers_cleaned.csv",
-        output_dir="outputs/arabert_evaluation"
+        model_path=ARABERT_MODEL_PATH,
+        data_path=TRANSFORMERS_DATASET_PATH,
+        output_dir=ARABERT_EVALUATION_OUTPUT_DIR
     )
