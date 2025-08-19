@@ -5,11 +5,8 @@ __pycache__/
 *.so
 
 # Model files (large binaries) - but keep best_model.pkl for quick start
-saved_models/traditional/*.pkl
 !saved_models/traditional/best_model.pkl
 saved_models/arabert/
-!saved_models/traditional/.gitkeep
-!saved_models/arabert/.gitkeep
 
 # Output files
 outputs/*/logs/
@@ -172,15 +169,8 @@ wandb/
 # TensorBoard
 runs/
 
-# Model checkpoints during training
-checkpoints/
-saved_models/
-
 # Configuration files with sensitive data
 config/secrets.yml
 config/secrets.json
 *.key
 *.pem
-
-# Fine-tuning models
-saved_models/arabert/

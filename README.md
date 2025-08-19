@@ -17,6 +17,7 @@
 ## 🚀 Quick Start
 
 ### Option 1: Pre-trained Models (Recommended)
+
 ```bash
 # Clone and setup
 git clone https://github.com/WalidAlsafadi/Palestine-Fake-News-Detector.git
@@ -29,9 +30,10 @@ python inference.py
 ```
 
 ### Option 2: Complete Training Pipeline
+
 ```bash
 # Train your own models from scratch
-python main.py --data-prep              # Data preparation  
+python main.py --data-prep              # Data preparation
 python main.py --model-selection        # Compare 5 ML algorithms
 python main.py --hyperparameter-tuning  # Optimize best model
 python main.py --final-evaluation       # Test set evaluation
@@ -86,6 +88,7 @@ Palestine-Fake-News-Detector/
 ## 🔧 Advanced Usage
 
 ### Adding Your Own Dataset
+
 Want to test Haqiqa on your Arabic news dataset? Your CSV needs `text` and `label` columns (0=Real, 1=Fake):
 
 ```python
@@ -97,7 +100,8 @@ DATASET_PATHS['my_dataset'] = 'data/processed/my_dataset.csv'
 python main.py --model-selection  # Test on your data
 ```
 
-### Using Haqiqa in Your Projects  
+### Using Haqiqa in Your Projects
+
 Want to integrate Haqiqa's trained model into your own application?
 
 ```python
@@ -115,6 +119,7 @@ print(f"This news is {result} (confidence: {confidence:.2%})")
 ```
 
 ### Web Interface
+
 ```bash
 # Run the modern Arabic web interface (Haqiqa brand)
 cd webapp/frontend && npm install && npm run dev
