@@ -1,4 +1,4 @@
-# Haqiqa - Arabic Fake News Detector
+# Haqiqa - Arabic Fake News Detector 🔍
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![AraBERT](https://img.shields.io/badge/AraBERT-96.22%25%20F1-orange.svg)](https://huggingface.co/aubmindlab/bert-base-arabertv02)
@@ -7,102 +7,114 @@
 
 **Haqiqa** (حقيقة - "Truth") is a production-ready system for detecting fake news in Arabic content. Features state-of-the-art **AraBERT (96.22% F1)** and **XGBoost (94.50% F1)** models with comprehensive evaluation on 13,750 verified samples.
 
-## 🏆 Performance Results
+## � Live Demo
 
-| Model       | F1-Score   | Accuracy   | AUC        | Inference  |
-| ----------- | ---------- | ---------- | ---------- | ---------- |
-| **AraBERT** | **96.22%** | **96.22%** | **99.57%** | **~200ms** |
-| **XGBoost** | **94.50%** | **94.51%** | **98.94%** | **<50ms**  |
+- **🚀 Web App**: [haqiqaa.vercel.app](https://haqiqaa.vercel.app) - Complete Arabic interface
+- **🤖 API**: [HuggingFace Space](https://walidalsafadi-haqiqa-arabic-fake-news-detector.hf.space/) - Direct model access
+- **📱 Repository**: [GitHub](https://github.com/WalidAlsafadi/Haqiqa-Arabic-Fake-News-Detector)
 
-## 🚀 Quick Start
+## 🏆 Performance Achievements
 
-### Option 1: Pre-trained Models (Recommended)
+| Model       | F1-Score   | Accuracy   | AUC        | Inference Speed |
+| ----------- | ---------- | ---------- | ---------- | --------------- |
+| **AraBERT** | **96.22%** | **96.22%** | **99.57%** | **~500ms**      |
+| **XGBoost** | **94.50%** | **94.51%** | **98.94%** | **~100ms**      |
+
+_Trained and evaluated on 13,750 Arabic news articles_
+
+## 🚀 Quick Usage
+
+### Try the Live Web App
+
+Visit **[haqiqaa.vercel.app](https://haqiqaa.vercel.app)** for the full Arabic interface with real-time analysis.
+
+### Use Pre-trained Models Locally
 
 ```bash
 # Clone and setup
-git clone https://github.com/WalidAlsafadi/Palestine-Fake-News-Detector.git
-cd Palestine-Fake-News-Detector
+git clone https://github.com/WalidAlsafadi/Haqiqa-Arabic-Fake-News-Detector.git
+cd Haqiqa-Arabic-Fake-News-Detector
 pip install -r requirements.txt
 
-# Immediate testing with pre-trained XGBoost model
-python inference.py
-# Choose option 1 (XGBoost) - ready to use!
-```
-
-### Option 2: Complete Training Pipeline
-
-```bash
-# Train your own models from scratch
-python main.py --data-prep              # Data preparation
-python main.py --model-selection        # Compare 5 ML algorithms
-python main.py --hyperparameter-tuning  # Optimize best model
-python main.py --final-evaluation       # Test set evaluation
-
-# Then test with your trained models
+# Test with pre-trained models
 python inference.py
 ```
 
-## 📊 Dataset & Methodology
+### API Integration
 
-- **Size**: 13,750 Arabic news samples
-- **Sources**: UCAS academic dataset + Kaggle Arabic verification data
-- **Distribution**: 60% train (8,250) | 20% validation (2,750) | 20% test (2,750)
+```python
+import requests
+
+# Using HuggingFace Space API
+response = requests.post(
+    "https://walidalsafadi-haqiqa-arabic-fake-news-detector.hf.space/api/predict",
+    json={"data": ["أخبار عاجلة من فلسطين", "arabert"]}
+)
+result = response.json()
+```
+
+## 📊 Research & Dataset
+
+- **Dataset Size**: 13,750 Arabic news articles
+- **Sources**: UCAS academic collection + Kaggle Arabic verification data
+- **Evaluation**: Stratified 60/20/20 split with 5-fold cross-validation
 - **Balance**: 46.6% real news, 53.4% fake news
-- **Evaluation**: Stratified splits, 5-fold cross-validation, held-out test set
+- **Focus**: Palestinian and general Arabic news content
 
-## 🛠️ Architecture
+## 🛠️ Technical Architecture
+
+### Production Stack
+
+- **Frontend**: Next.js 15 + TypeScript + Tailwind CSS → [Vercel](https://haqiqaa.vercel.app)
+- **Backend**: Gradio API + AraBERT + XGBoost → [HuggingFace Spaces](https://huggingface.co/spaces/WalidAlsafadi/Haqiqa-Arabic-Fake-News-Detector)
+- **Models**: Fine-tuned AraBERT, optimized XGBoost
+- **Infrastructure**: Automated deployment pipeline
 
 ### Core Components
 
-- **Text Processing**: 3 cleaning strategies (minimal/aggressive/transformers)
+- **Text Processing**: 3 cleaning strategies (minimal/aggressive/transformers-ready)
 - **ML Pipeline**: Model selection → Hyperparameter tuning → Evaluation
-- **Models**: XGBoost, SVM, Random Forest, Logistic Regression, Naive Bayes
 - **Deep Learning**: Fine-tuned AraBERT for Arabic text classification
-- **Inference**: Smart model loading and comparison interface
-
-### Technical Stack
-
-- **ML**: Scikit-learn, XGBoost, PyTorch, Transformers (HuggingFace)
-- **NLP**: NLTK, Arabic-Stopwords, custom Arabic normalization
-- **Web**: Next.js frontend, Gradio API backend
-- **Data**: Pandas, NumPy, stratified sampling
+- **Web Interface**: RTL Arabic support with confidence visualization
 
 ## 📁 Project Structure
 
 ```
-Palestine-Fake-News-Detector/
-├── inference.py              # Smart model selection & testing
-├── main.py                   # Complete ML pipeline
-├── src/
-│   ├── config/settings.py    # Centralized configuration
-│   ├── preprocessing/        # Arabic text cleaning
-│   ├── ml_algorithms/        # Model selection, tuning, evaluation
-│   ├── transformers/arabert/ # AraBERT training & evaluation
-│   └── utils/data_splits.py  # Consistent data splitting
-├── data/processed/           # Clean datasets (13,750 samples)
-├── saved_models/             # Trained models (XGBoost + AraBERT)
-├── outputs/                  # Results, metrics, visualizations
-└── webapp/                   # Web interface (Haqiqa brand)
+Haqiqa-Arabic-Fake-News-Detector/
+├── 📊 Research & Training
+│   ├── inference.py              # Smart model testing interface
+│   ├── main.py                   # Complete ML pipeline
+│   ├── src/                      # Core ML algorithms & preprocessing
+│   ├── data/processed/           # Clean datasets (13,750 samples)
+│   ├── saved_models/             # Trained models (AraBERT + XGBoost)
+│   └── outputs/                  # Results, metrics, visualizations
+└── 🌐 Production Web App
+    ├── webapp/frontend/          # Next.js Arabic interface
+    └── webapp/backend/           # Gradio API server
 ```
 
-## 🔧 Advanced Usage
+## 🔧 For Developers
 
-### Adding Your Own Dataset
+### Training Your Own Models
 
-Want to test Haqiqa on your Arabic news dataset? Your CSV needs `text` and `label` columns (0=Real, 1=Fake):
+```bash
+# Complete training pipeline
+python main.py --data-prep              # Data preparation
+python main.py --model-selection        # Compare 5 ML algorithms
+python main.py --hyperparameter-tuning  # Optimize best model
+python main.py --final-evaluation       # Test set evaluation
+```
+
+### Adding Custom Datasets
 
 ```python
-# Add your dataset to the pipeline
+# Your CSV needs 'text' and 'label' columns (0=Real, 1=Fake)
 from src.config.settings import DATASET_PATHS
 DATASET_PATHS['my_dataset'] = 'data/processed/my_dataset.csv'
-
-# Run evaluation
-python main.py --model-selection  # Test on your data
+python main.py --model-selection
 ```
 
-### Using Haqiqa in Your Projects
-
-Want to integrate Haqiqa's trained model into your own application?
+### Integration Example
 
 ```python
 from src.ml_algorithms.model_selection import load_best_pipeline
@@ -113,17 +125,21 @@ def detect_fake_news(arabic_text):
     confidence = pipeline.predict_proba([arabic_text])[0].max()
     return "Fake" if prediction == 1 else "Real", confidence
 
-# Usage example
+# Usage
 result, confidence = detect_fake_news("خبر عاجل من فلسطين...")
 print(f"This news is {result} (confidence: {confidence:.2%})")
 ```
 
-### Web Interface
+### Local Web Development
 
 ```bash
-# Run the modern Arabic web interface (Haqiqa brand)
+# Frontend (Next.js)
 cd webapp/frontend && npm install && npm run dev
-# Access at http://localhost:3000
+# → http://localhost:3000
+
+# Backend (Gradio)
+cd webapp/backend && python app.py
+# → http://localhost:7860
 ```
 
 ## 📄 License & Contact

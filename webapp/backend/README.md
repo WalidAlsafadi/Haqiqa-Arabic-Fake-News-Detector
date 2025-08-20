@@ -9,45 +9,66 @@ app_file: app.py
 pinned: false
 ---
 
-# AraBERT Arabic Fake News Detector - Backend
+# Haqiqa Arabic Fake News Detection API 🤖
 
-A high-performance backend service for detecting fake news in Arabic text using a fine-tuned AraBERT model.
+A high-performance Gradio API for detecting fake news in Arabic text using fine-tuned AraBERT and XGBoost models.
 
-## 🚀 Features
+🌐 **Live API**: [walidalsafadi-haqiqa-arabic-fake-news-detector.hf.space](https://walidalsafadi-haqiqa-arabic-fake-news-detector.hf.space/)
 
-- **Advanced ML Model**: Fine-tuned AraBERT model trained on Palestinian news data
-- **Real-time Detection**: Fast inference with confidence scores
-- **Arabic NLP**: Specialized for Arabic text processing with RTL support
-- **Production Ready**: Optimized for deployment on various platforms
-- **API Interface**: Clean Gradio interface for easy integration
+## 🎯 Models Available
 
-## 🛠 Technology Stack
+| Model       | Accuracy | Speed  | Best For         |
+| ----------- | -------- | ------ | ---------------- |
+| **AraBERT** | 96.22%   | ~500ms | Maximum accuracy |
+| **XGBoost** | 94.51%   | ~100ms | Fast inference   |
 
-- **Deep Learning**: PyTorch + Transformers (Hugging Face)
-- **NLP Model**: AraBERT (Arabic BERT)
-- **Web Framework**: Gradio
-- **Language**: Python 3.8+
+## 🚀 API Usage
 
-## 📦 Installation
+### Gradio Interface
 
-1. Install dependencies:
+Visit the live link above and paste Arabic text to get instant results.
 
-```bash
-pip install -r requirements.txt
+### Python Integration
+
+```python
+import requests
+
+response = requests.post(
+    "https://walidalsafadi-haqiqa-arabic-fake-news-detector.hf.space/api/predict",
+    json={
+        "data": [
+            "أخبار عاجلة من فلسطين حول أحداث مهمة",  # Arabic text
+            "arabert"  # or "xgboost"
+        ]
+    }
+)
+
+result = response.json()
+print(f"Prediction: {result['data']}")
 ```
 
-2. Run the application:
+### cURL Example
 
 ```bash
-python app.py
+curl -X POST "https://walidalsafadi-haqiqa-arabic-fake-news-detector.hf.space/api/predict" \
+     -H "Content-Type: application/json" \
+     -d '{"data": ["النص العربي المراد تحليله", "arabert"]}'
 ```
 
-The app will be available at `http://localhost:7860`
+## � Response Format
 
-## 🔧 Model Configuration
+```json
+{
+  "data": {
+    "model": "arabert",
+    "prediction": "Real", // or "Fake"
+    "confidence": 95.5,
+    "real_prob": 95.5,
+    "fake_prob": 4.5
+  }
+}
+```
 
-- **Base Model**: `aubmindlab/bert-base-arabertv02`
-- **Fine-tuned Model**: `WalidAlsafadi/arabert-fake-news-detector`
 - **Input**: Arabic text (max 512 tokens)
 - **Output**: Binary classification (Real/Fake) with confidence scores
 

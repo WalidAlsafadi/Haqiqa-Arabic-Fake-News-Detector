@@ -1,87 +1,91 @@
-# حقيقة (Haqiqa) - Palestine Fake News Detector Frontend
+# Haqiqa Frontend - Arabic News Verification Interface 🎨
 
-Modern Arabic RTL web application for detecting fake news in Palestinian content. Built with Next.js 15, TypeScript, and Tailwind CSS.
+Modern Arabic RTL web application for the Haqiqa fake news detection system.
 
-## 🌟 Features
+🌐 **Live App**: [haqiqaa.vercel.app](https://haqiqaa.vercel.app)
 
-- **🔍 Real-time Analysis**: Instant fake news detection for Arabic text
-- **📱 Responsive Design**: Optimized for all devices and screen sizes
-- **🎨 Arabic RTL Support**: Full right-to-left layout with Cairo font
-- **✨ Modern UI/UX**: Clean, professional interface with smooth animations
-- **📧 Contact Integration**: Working contact form with email functionality
-- **🚀 Production Ready**: Optimized for Vercel deployment
-- **🎯 Perfect Mobile Navigation**: Smooth scrolling with header offset compensation
+## ✨ Features Delivered
 
-## 🛠️ Tech Stack
+- **🔍 Real-time Analysis**: Instant fake news detection with confidence visualization
+- **📱 Responsive Design**: Perfect mobile and desktop experience
+- **🎨 Arabic RTL Layout**: Native right-to-left support with Cairo font
+- **🤖 Dual Model Selection**: Choose between AraBERT (high accuracy) or XGBoost (fast)
+- **� Confidence Visualization**: Interactive circular progress indicators
+- **⚡ Production Optimized**: Deployed on Vercel with performance optimizations
 
-- **Framework**: Next.js 15.4.6 with App Router
-- **Language**: TypeScript 5.2.2
-- **Styling**: Tailwind CSS 3.3.3 with RTL support
-- **UI Components**: Custom shadcn/ui components
-- **Icons**: Lucide React
-- **Font**: Cairo (Google Fonts)
-- **Deployment**: Vercel-ready
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- Node.js 18+
-- npm or yarn package manager
-
-### Installation
+## 🚀 Development Setup
 
 ```bash
-# Clone the repository
-git clone https://github.com/WalidAlsafadi/Palestine-Fake-News-Detector
-cd Palestine-Fake-News-Detector/app/frontend
-
 # Install dependencies
 npm install
 
+# Configure environment
+cp .env.example .env.local
+# Edit .env.local with your HuggingFace Space URL
+
 # Run development server
 npm run dev
+# → http://localhost:3000
+
+# Build for production
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the application.
+## ⚙️ Environment Configuration
 
-### Build for Production
+Create `.env.local`:
 
 ```bash
+HF_SPACE_URL="https://walidalsafadi-haqiqa-arabic-fake-news-detector.hf.space"
+```
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 15 (App Router) + TypeScript
+- **Styling**: Tailwind CSS with RTL support
+- **UI**: shadcn/ui + Lucide React icons
+- **API**: Integration with HuggingFace Spaces backend
+- **Deployment**: Vercel with automatic deployments
+
 # Create production build
+
 npm run build
 
 # Test production build locally
+
 npm run start
+
 ```
 
 ## 📁 Project Structure
 
 ```
+
 webapp/frontend/
-├── app/                    # Next.js App Router
-│   ├── globals.css        # Global styles with Cairo font
-│   ├── layout.tsx         # Root layout with RTL support
-│   └── page.tsx           # Main page component
-├── components/            # React components
-│   ├── ui/               # Reusable UI components
-│   │   ├── button.tsx
-│   │   ├── card.tsx
-│   │   ├── input.tsx
-│   │   └── textarea.tsx
-│   ├── About.tsx         # About section
-│   ├── Contact.tsx       # Contact form
-│   ├── Developer.tsx     # Developer information
-│   ├── Footer.tsx        # Site footer
-│   ├── Header.tsx        # Navigation header
-│   ├── Hero.tsx          # Hero section
-│   └── NewsAnalyzer.tsx  # News analysis component
-├── public/               # Static assets
-│   ├── haqiqa-logo.svg  # Main logo
-│   └── palestine-map.svg # Palestine map icon
-├── lib/                  # Utility functions
-└── types/               # TypeScript type definitions
-```
+├── app/ # Next.js App Router
+│ ├── globals.css # Global styles with Cairo font
+│ ├── layout.tsx # Root layout with RTL support
+│ └── page.tsx # Main page component
+├── components/ # React components
+│ ├── ui/ # Reusable UI components
+│ │ ├── button.tsx
+│ │ ├── card.tsx
+│ │ ├── input.tsx
+│ │ └── textarea.tsx
+│ ├── About.tsx # About section
+│ ├── Contact.tsx # Contact form
+│ ├── Developer.tsx # Developer information
+│ ├── Footer.tsx # Site footer
+│ ├── Header.tsx # Navigation header
+│ ├── Hero.tsx # Hero section
+│ └── NewsAnalyzer.tsx # News analysis component
+├── public/ # Static assets
+│ ├── haqiqa-logo.svg # Main logo
+│ └── palestine-map.svg # Palestine map icon
+├── lib/ # Utility functions
+└── types/ # TypeScript type definitions
+
+````
 
 ## 🎨 Design System
 
@@ -119,7 +123,7 @@ NEXT_PUBLIC_FORMSPREE_ID=your_formspree_id
 
 # Analytics (optional)
 NEXT_PUBLIC_GA_ID=your_google_analytics_id
-```
+````
 
 ### Tailwind CSS
 
