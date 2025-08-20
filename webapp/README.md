@@ -1,42 +1,39 @@
-# Palestine Fake News Detector - Web Applications
+# حقيقة (Haqiqa) - Arabic Fake News Detection Web Application
 
-Professional web applications for detecting fake news in Palestinian Arabic content. Featuring a modern Next.js frontend and powerful AraBERT backend API.
+Professional web application for detecting fake news in Arabic content, featuring a modern Next.js frontend and powerful AraBERT backend API.
 
-## 🌟 Applications Overview
+## 🌟 Features
 
-### 🎨 Frontend: حقيقة (Haqiqa) - Modern Arabic Web App
+### 🎨 Frontend: Modern Arabic Web Interface
 
-Professional Arabic RTL web application built with Next.js 15, TypeScript, and Tailwind CSS.
-
-**Key Features:**
-
-- ✨ Full Arabic RTL support with Cairo font
-- 📱 Perfect responsive design with mobile navigation
-- 🔍 Real-time news analysis interface
-- 📧 Contact form integration
-- 🚀 Production-ready for Vercel deployment
-- 🎯 Smooth scrolling with perfect mobile experience
+- ✨ **Full Arabic RTL Support** - Native right-to-left layout with Cairo font
+- 📱 **Responsive Design** - Perfect mobile and desktop experience
+- 🔍 **Real-time Analysis** - Instant news credibility detection
+- 🎯 **Dual Model Selection** - Choose between AraBERT and XGBoost models
+- � **Confidence Visualization** - Interactive circular progress indicators
+- 🚀 **Production Ready** - Optimized for Vercel deployment
 
 ### 🤖 Backend: AraBERT ML API
 
-High-performance Gradio-based API for Arabic fake news detection.
-
-**Key Features:**
-
-- 🧠 Fine-tuned AraBERT model (94.2% accuracy)
-- ⚡ Fast inference (~100ms per prediction)
-- 🌐 RESTful API endpoints
-- 📊 Confidence scores and detailed results
-- 🚀 Ready for Hugging Face Spaces deployment
+- 🧠 **High Accuracy Models** - AraBERT: 96.22%, XGBoost: 94.51%
+- ⚡ **Fast Inference** - Sub-second response times
+- 🌐 **RESTful API** - Clean JSON endpoints
+- � **Detailed Results** - Confidence scores and probability distributions
+- � **Production Ready** - Deployed on Hugging Face Spaces
 
 ## 🚀 Quick Start
 
-### Frontend Development
+### Prerequisites
 
-1. **Navigate to frontend:**
+- Node.js 18+ and npm
+- Python 3.8+ and pip (for backend)
+
+### Frontend Setup
+
+1. **Navigate to frontend directory:**
 
    ```bash
-   cd app/frontend
+   cd webapp/frontend
    ```
 
 2. **Install dependencies:**
@@ -45,23 +42,32 @@ High-performance Gradio-based API for Arabic fake news detection.
    npm install
    ```
 
-3. **Run development server:**
+3. **Configure environment:**
+
+   ```bash
+   cp .env.example .env.local
+   # Edit .env.local with your Hugging Face Space URL
+   ```
+
+4. **Run development server:**
 
    ```bash
    npm run dev
    ```
 
-4. **Build for production:**
+   Visit [http://localhost:3000](http://localhost:3000)
+
+5. **Build for production:**
    ```bash
-   npm run build
+   npm run build && npm run start
    ```
 
-### Backend Development
+### Backend Setup
 
-1. **Navigate to backend:**
+1. **Navigate to backend directory:**
 
    ```bash
-   cd app/backend
+   cd webapp/backend
    ```
 
 2. **Install dependencies:**
@@ -76,31 +82,180 @@ High-performance Gradio-based API for Arabic fake news detection.
    python app.py
    ```
 
-   Access at: `http://localhost:7860`
+   Access API at [http://localhost:7860](http://localhost:7860)
 
-Visit [http://localhost:3000](http://localhost:3000) to view the application.
+## 📊 Model Performance
 
-### Backend Deployment (Hugging Face Spaces)
+| Model       | Accuracy | F1-Score | AUC    | Speed  |
+| ----------- | -------- | -------- | ------ | ------ |
+| **AraBERT** | 96.22%   | 96.22%   | 99.57% | ~500ms |
+| **XGBoost** | 94.51%   | 94.50%   | 98.94% | ~100ms |
 
-1. **Navigate to backend directory:**
+_Trained on 13,750 Arabic news articles_
+
+## 🔧 Tech Stack
+
+### Frontend
+
+- **Framework:** Next.js 15 (App Router)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **UI Components:** Radix UI + shadcn/ui
+- **Icons:** Lucide React
+- **Visualization:** react-circular-progressbar
+
+### Backend
+
+- **Framework:** Gradio
+- **ML Models:** AraBERT, XGBoost
+- **Language:** Python
+- **Deployment:** Hugging Face Spaces
+
+## 📁 Project Structure
+
+```
+webapp/
+├── frontend/                 # Next.js application
+│   ├── app/                 # App router pages
+│   │   ├── api/analyze/     # Backend API integration
+│   │   ├── layout.tsx       # Root layout
+│   │   └── page.tsx         # Home page
+│   ├── components/          # React components
+│   │   ├── ui/             # shadcn/ui components
+│   │   ├── About.tsx       # About section
+│   │   ├── NewsAnalyzer.tsx # Main analyzer interface
+│   │   └── ...             # Other components
+│   ├── lib/                # Utilities
+│   │   └── hf.ts           # Hugging Face API client
+│   └── public/             # Static assets
+│
+├── backend/                 # Gradio API server
+│   ├── app.py              # Main API application
+│   ├── requirements.txt    # Python dependencies
+│   └── *.pkl              # Trained model files
+│
+├── deploy.sh               # Deployment scripts
+├── deploy.ps1
+└── README.md               # This file
+```
+
+## 🚀 Deployment
+
+### Frontend (Vercel)
+
+1. **Connect repository to Vercel**
+2. **Configure build settings:**
+   - Build Command: `cd webapp/frontend && npm run build`
+   - Output Directory: `webapp/frontend/.next`
+3. **Set environment variables:**
+   - `HF_SPACE_URL`: Your Hugging Face Space URL
+
+### Backend (Hugging Face Spaces)
+
+1. **Create new Space on Hugging Face:**
+
+   - Go to [huggingface.co/spaces](https://huggingface.co/spaces)
+   - Choose SDK: Gradio
+   - Set visibility: Public
+
+2. **Upload backend files:**
 
    ```bash
    cd webapp/backend
+   # Upload all files to your Space repository
    ```
 
-2. **Create a new Hugging Face Space:**
+3. **Your Space will be available at:**
+   `https://huggingface.co/spaces/YOUR_USERNAME/SPACE_NAME`
 
-   - Go to [huggingface.co/spaces](https://huggingface.co/spaces)
-   - Click "Create new Space"
-   - Choose SDK: Gradio
-   - Set visibility: Public
-   - Name your space (e.g., `arabert-fake-news-detector`)
+## 🔑 Environment Variables
 
-3. **Upload files to your Space:**
+### Frontend (.env.local)
 
-   - Upload `app.py`
-   - Upload `requirements.txt`
-   - Upload `README.md`
+```bash
+HF_SPACE_URL="https://your-username-your-space.hf.space"
+HF_API_TOKEN=""  # Optional, for private spaces
+```
+
+## 📱 API Usage
+
+### Analyze Text Endpoint
+
+```http
+POST /api/analyze
+Content-Type: application/json
+
+{
+  "text": "النص الإخباري المراد تحليله",
+  "model": "arabert" | "xgboost"
+}
+```
+
+### Response
+
+```json
+{
+  "ok": true,
+  "data": {
+    "model": "arabert",
+    "prediction": "Real" | "Fake",
+    "confidence": 95.5,
+    "real_prob": 95.5,
+    "fake_prob": 4.5
+  }
+}
+```
+
+## 🛠️ Development
+
+### Code Quality
+
+```bash
+# Frontend linting
+cd webapp/frontend
+npm run lint
+
+# Type checking
+npx tsc --noEmit
+```
+
+### Testing
+
+```bash
+# Frontend build test
+npm run build
+
+# Backend functionality test
+cd webapp/backend
+python app.py
+```
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](../LICENSE) file for details.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📞 Support
+
+For questions and support:
+
+- 📧 Email: [Contact Information]
+- 🐛 Issues: [GitHub Issues](https://github.com/WalidAlsafadi/Haqiqa-Arabic-Fake-News-Detector/issues)
+
+---
+
+Made with ❤️ for Arabic content verification
+
+- Upload `app.py`
+- Upload `requirements.txt`
+- Upload `README.md`
 
 4. **Your Space will automatically build and deploy!**
 

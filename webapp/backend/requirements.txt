@@ -2,3 +2,5 @@ torch
 transformers
 gradio
 safetensors
+scikit-learn
+xgboost

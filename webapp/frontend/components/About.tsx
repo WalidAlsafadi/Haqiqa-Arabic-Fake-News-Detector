@@ -1,13 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  ExternalLink,
-  Github,
-  Linkedin,
-  Bot,
-  Microscope,
-  BarChart3,
-  Cpu,
-} from "lucide-react";
+import { Bot, Microscope, BarChart3, Cpu } from "lucide-react";
 
 export default function About() {
   return (
@@ -38,7 +30,7 @@ export default function About() {
               <ul className="text-gray-600 space-y-2 text-sm">
                 <li>Traditional ML: XGBoost •</li>
                 <li>Transformers: AraBERT •</li>
-                <li>Accuracy: 93.48% •</li>
+                <li>Best Accuracy: 96.22% •</li>
               </ul>
             </CardContent>
           </Card>
@@ -70,7 +62,7 @@ export default function About() {
               <ul className="text-gray-600 space-y-2 text-sm">
                 <li>Natural language processing •</li>
                 <li>Sentiment analysis and context understanding •</li>
-                <li>Advanced cloud deployment •</li>
+                <li>Hugging Face & Vercel deployment •</li>
               </ul>
             </CardContent>
           </Card>
@@ -96,9 +88,9 @@ export default function About() {
                   </h4>
                 </div>
                 <ul className="text-emerald-700 space-y-2">
-                  <li>• Accuracy: 93.48%</li>
-                  <li>• AUC: 98.1%</li>
-                  <li>• F1-Score: 93.53%</li>
+                  <li>• Accuracy: 96.22%</li>
+                  <li>• AUC: 99.57%</li>
+                  <li>• F1-Score: 96.22%</li>
                 </ul>
               </div>
 
@@ -110,9 +102,9 @@ export default function About() {
                   </h4>
                 </div>
                 <ul className="text-blue-700 space-y-2">
-                  <li>• Accuracy: 90.61%</li>
-                  <li>• AUC: 96.53%</li>
-                  <li>• F1-Score: 90.79%</li>
+                  <li>• Accuracy: 94.51%</li>
+                  <li>• AUC: 98.94%</li>
+                  <li>• F1-Score: 94.50%</li>
                 </ul>
               </div>
             </div>

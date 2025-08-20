@@ -1,3 +1,14 @@
+---
+title: Haqiqa Arabic Fake News Detector
+emoji: 📰
+colorFrom: blue
+colorTo: green
+sdk: gradio
+sdk_version: 5.42.0
+app_file: app.py
+pinned: false
+---
+
 # AraBERT Arabic Fake News Detector - Backend
 
 A high-performance backend service for detecting fake news in Arabic text using a fine-tuned AraBERT model.
@@ -98,4 +109,4 @@ The backend exposes endpoints that can be consumed by:
 
 ## 📄 License
 
-MIT License - see LICENSE file for details
+**Licensed under Apache 2.0** - see [LICENSE](LICENSE) for details.

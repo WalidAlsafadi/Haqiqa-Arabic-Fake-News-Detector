@@ -10,7 +10,7 @@ export default function HowItWorks() {
     {
       icon: Brain,
       title: "التحليل بالذكاء الاصطناعي",
-      description: "يقوم نموذج AraBERT المدرب بتحليل النص وتقييم مصداقيته",
+      description: "يقوم نموذج المدرب بتحليل النص وتقييم مصداقيته",
     },
     {
       icon: CheckCircle,
