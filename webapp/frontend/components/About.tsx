@@ -81,13 +81,13 @@ export default function About() {
             </div>
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-emerald-50 p-6 rounded-xl border border-emerald-200">
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-3 mb-4" dir="ltr">
                   <BarChart3 className="w-6 h-6 text-emerald-600" />
                   <h4 className="font-semibold text-emerald-800">
                     AraBERT (Transformers)
                   </h4>
                 </div>
-                <ul className="text-emerald-700 space-y-2">
+                <ul className="text-emerald-700 space-y-2 text-left" dir="ltr">
                   <li>• Accuracy: 96.22%</li>
                   <li>• AUC: 99.57%</li>
                   <li>• F1-Score: 96.22%</li>
@@ -95,13 +95,13 @@ export default function About() {
               </div>
 
               <div className="bg-blue-50 p-6 rounded-xl border border-blue-200">
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-3 mb-4" dir="ltr">
                   <BarChart3 className="w-6 h-6 text-blue-600" />
                   <h4 className="font-semibold text-blue-800">
                     XGBoost (Machine Learning)
                   </h4>
                 </div>
-                <ul className="text-blue-700 space-y-2">
+                <ul className="text-blue-700 space-y-2 text-left" dir="ltr">
                   <li>• Accuracy: 94.51%</li>
                   <li>• AUC: 98.94%</li>
                   <li>• F1-Score: 94.50%</li>

@@ -161,7 +161,7 @@ export default function NewsAnalyzer() {
         <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
           <div className="grid lg:grid-cols-2 gap-0 min-h-[500px]">
             {/* قسم الإدخال - الجانب الأيمن */}
-            <div className="p-8 order-2 lg:order-1">
+            <div className="p-8 order-1 lg:order-1">
               <div className="space-y-6 h-full flex flex-col">
                 {/* مربع النص الكبير */}
                 <div className="flex-1 flex flex-col">
@@ -221,7 +221,7 @@ export default function NewsAnalyzer() {
             </div>
 
             {/* قسم النتائج - الجانب الأيسر */}
-            <div className="p-8 bg-gray-50 order-1 lg:order-2">
+            <div className="p-8 bg-gray-50 order-2 lg:order-2">
               {result ? (
                 <div className="h-full flex flex-col justify-center space-y-6 divide-y divide-gray-100">
                   {/* شارة النتيجة */}

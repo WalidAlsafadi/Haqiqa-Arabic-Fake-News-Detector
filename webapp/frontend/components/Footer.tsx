@@ -15,9 +15,6 @@ export default function Footer() {
             <p className="text-blue-100 mb-2">
               © 2025 وليد الصفدي - جميع الحقوق محفوظة
             </p>
-            <p className="text-sm text-blue-200">
-              مبني باستخدام Next.js، Tailwind CSS، و AraBERT
-            </p>
           </div>
         </div>
       </div>

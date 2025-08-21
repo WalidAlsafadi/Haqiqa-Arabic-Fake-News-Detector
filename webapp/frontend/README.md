@@ -1,234 +1,138 @@
-# Haqiqa Frontend - Arabic News Verification Interface 🎨
+# حقيقة (Haqiqa) - Arabic News Verification Platform 📰
 
-Modern Arabic RTL web application for the Haqiqa fake news detection system.
+**Advanced AI-powered platform for detecting fake news in Arabic content**
 
-🌐 **Live App**: [haqiqaa.vercel.app](https://haqiqaa.vercel.app)
+🌐 **Live Application**: [haqiqaa.vercel.app](https://haqiqaa.vercel.app)
 
-## ✨ Features Delivered
+---
 
-- **🔍 Real-time Analysis**: Instant fake news detection with confidence visualization
-- **📱 Responsive Design**: Perfect mobile and desktop experience
-- **🎨 Arabic RTL Layout**: Native right-to-left support with Cairo font
-- **🤖 Dual Model Selection**: Choose between AraBERT (high accuracy) or XGBoost (fast)
-- **� Confidence Visualization**: Interactive circular progress indicators
-- **⚡ Production Optimized**: Deployed on Vercel with performance optimizations
+## 🎯 What is Haqiqa?
 
-## 🚀 Development Setup
+Haqiqa (حقيقة - meaning "Truth" in Arabic) is an intelligent web application that helps users verify the authenticity of Arabic news content. Using state-of-the-art AI models, it analyzes text and provides confidence scores to help combat misinformation in Arabic media.
+
+## ✨ Key Features
+
+### 🔍 **Instant Analysis**
+
+- Real-time fake news detection
+- Visual confidence indicators with circular progress bars
+- Detailed probability breakdown (Real vs Fake)
+
+### 🤖 **Dual AI Models**
+
+- **AraBERT**: High accuracy (96.22%) for detailed analysis
+- **XGBoost**: Fast processing (94.51%) for quick verification
+
+### 📱 **Mobile-First Design**
+
+- Responsive layout optimized for all devices
+- Native Arabic RTL support
+- Clean, intuitive interface
+
+### 🎨 **Smart User Experience**
+
+- Input section positioned first on mobile
+- Results displayed clearly at bottom
+- Character counter and model selection
+- Professional Arabic typography with Cairo font
+
+## 🚀 How to Use
+
+1. **Visit the Application**: Go to [haqiqaa.vercel.app](https://haqiqaa.vercel.app)
+2. **Enter Arabic Text**: Paste your news content in the text area
+3. **Choose Model**: Select AraBERT (accurate) or XGBoost (fast)
+4. **Get Results**: View confidence scores and authenticity assessment
+
+## 📊 Model Performance
+
+<div align="left">
+
+**AraBERT (Transformers)**
+
+- Accuracy: 96.22%
+- AUC: 99.57%
+- F1-Score: 96.22%
+
+**XGBoost (Machine Learning)**
+
+- Accuracy: 94.51%
+- AUC: 98.94%
+- F1-Score: 94.50%
+
+</div>
+
+## 🛠️ Technical Features
+
+- **Framework**: Next.js 15 with TypeScript
+- **Styling**: Tailwind CSS with RTL support
+- **UI Components**: shadcn/ui design system
+- **Deployment**: Vercel with automatic scaling
+- **Performance**: Optimized for speed and reliability
+
+## 🏗️ Development Setup
 
 ```bash
-# Install dependencies
+# Clone and install
+git clone https://github.com/WalidAlsafadi/Haqiqa-Arabic-Fake-News-Detector.git
+cd webapp/frontend
 npm install
 
 # Configure environment
 cp .env.example .env.local
-# Edit .env.local with your HuggingFace Space URL
+# Add your HuggingFace Space URL
 
-# Run development server
+# Start development
 npm run dev
-# → http://localhost:3000
-
-# Build for production
-npm run build
-```
-
-## ⚙️ Environment Configuration
-
-Create `.env.local`:
-
-```bash
-HF_SPACE_URL="https://walidalsafadi-haqiqa-arabic-fake-news-detector.hf.space"
-```
-
-## 🛠️ Tech Stack
-
-- **Framework**: Next.js 15 (App Router) + TypeScript
-- **Styling**: Tailwind CSS with RTL support
-- **UI**: shadcn/ui + Lucide React icons
-- **API**: Integration with HuggingFace Spaces backend
-- **Deployment**: Vercel with automatic deployments
-
-# Create production build
-
-npm run build
-
-# Test production build locally
-
-npm run start
-
+# Visit http://localhost:3000
 ```
 
 ## 📁 Project Structure
 
 ```
+frontend/
+├── app/              # Next.js app router
+├── components/       # React components
+│   ├── NewsAnalyzer.tsx  # Main analysis interface
+│   ├── About.tsx         # About section
+│   └── ui/              # Reusable UI components
+├── public/           # Static assets
+└── lib/             # Utilities and helpers
+```
 
-webapp/frontend/
-├── app/ # Next.js App Router
-│ ├── globals.css # Global styles with Cairo font
-│ ├── layout.tsx # Root layout with RTL support
-│ └── page.tsx # Main page component
-├── components/ # React components
-│ ├── ui/ # Reusable UI components
-│ │ ├── button.tsx
-│ │ ├── card.tsx
-│ │ ├── input.tsx
-│ │ └── textarea.tsx
-│ ├── About.tsx # About section
-│ ├── Contact.tsx # Contact form
-│ ├── Developer.tsx # Developer information
-│ ├── Footer.tsx # Site footer
-│ ├── Header.tsx # Navigation header
-│ ├── Hero.tsx # Hero section
-│ └── NewsAnalyzer.tsx # News analysis component
-├── public/ # Static assets
-│ ├── haqiqa-logo.svg # Main logo
-│ └── palestine-map.svg # Palestine map icon
-├── lib/ # Utility functions
-└── types/ # TypeScript type definitions
+## 🌐 Environment Variables
 
-````
-
-## 🎨 Design System
-
-### Colors
-
-- **Primary**: #799EFF (Brand blue)
-- **Background**: #F8FAFC (Light gray)
-- **Text**: #1E293B (Dark slate)
-- **Accent**: #10B981 (Green for success)
-- **Error**: #EF4444 (Red for errors)
-
-### Typography
-
-- **Font Family**: Cairo (Arabic-optimized)
-- **Headings**: Font weights 600-700
-- **Body**: Font weight 400
-- **RTL Support**: Full Arabic text direction
-
-### Components
-
-- **Cards**: Elevated design with subtle shadows
-- **Buttons**: Primary and secondary variants
-- **Forms**: Clean inputs with proper validation
-- **Navigation**: Responsive header with mobile menu
-
-## 🔧 Configuration
-
-### Environment Variables
-
-Create a `.env.local` file for local development:
+For local development, create `.env.local`:
 
 ```bash
-# Contact form endpoint (Formspree)
-NEXT_PUBLIC_FORMSPREE_ID=your_formspree_id
-
-# Analytics (optional)
-NEXT_PUBLIC_GA_ID=your_google_analytics_id
-````
-
-### Tailwind CSS
-
-The project uses a custom Tailwind configuration with:
-
-- RTL support via `dir="rtl"` attribute
-- Custom color palette
-- Arabic typography optimizations
-- Responsive breakpoints
+HF_SPACE_URL="https://walidalsafadi-haqiqa-arabic-fake-news-detector.hf.space"
+NEXT_PUBLIC_FORMSPREE_ID="your_contact_form_id"  # Optional for contact form
+```
 
 ## 🚀 Deployment
 
-### Vercel (Recommended)
-
-1. Connect your GitHub repository to Vercel
-2. Configure environment variables
-3. Deploy automatically on push to main branch
-
-```bash
-# Deploy to Vercel
-npx vercel
-
-# Production deployment
-npx vercel --prod
-```
+The application is deployed on Vercel with automatic deployments from the main branch.
 
 ### Manual Deployment
 
 ```bash
-# Build the application
-npm run build
-
-# The output will be in the .next folder
-# Deploy the contents to your hosting provider
-```
-
-## 🧪 Development
-
-### Available Scripts
-
-```bash
-npm run dev      # Start development server
 npm run build    # Build for production
-npm run start    # Start production server
-npm run lint     # Run ESLint
-npm run type-check # Run TypeScript compiler
+npm run start    # Test production build locally
 ```
 
-### Code Quality
+## 📱 Browser Support
 
-- **ESLint**: Configured with Next.js recommended rules
-- **TypeScript**: Strict mode enabled
-- **Prettier**: Code formatting (optional)
-
-## 🌐 Internationalization
-
-The application is built with Arabic RTL support:
-
-- Text direction: Right-to-left
-- Layout mirroring: Automatic with Tailwind
-- Font optimization: Cairo font for Arabic text
-- Cultural considerations: Palestinian context
-
-## 📱 Mobile Optimization
-
-- **Responsive Design**: Mobile-first approach
-- **Touch Interactions**: Optimized for touch devices
-- **Performance**: Lightweight and fast loading
-- **Accessibility**: ARIA labels and semantic HTML
-
-## 🔒 Security
-
-- **Form Validation**: Client and server-side validation
-- **Content Security**: Protected against XSS
-- **Environment Variables**: Secure configuration
-- **HTTPS**: SSL/TLS encryption in production
+- Modern browsers with ES2020+ support
+- Mobile Safari and Chrome
+- Optimized for Arabic RTL text rendering
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push to branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
-
-### Development Guidelines
-
-- Follow TypeScript best practices
-- Use semantic commit messages
-- Test components thoroughly
-- Maintain RTL compatibility
-- Update documentation
+Contributions are welcome! Please read our contributing guidelines and submit pull requests for any improvements.
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](../../LICENSE) file for details.
 
-## 🙏 Acknowledgments
-
-- **AraBERT**: For Arabic language processing
-- **Tailwind CSS**: For utility-first styling
-- **Next.js**: For the React framework
-- **Vercel**: For hosting and deployment
-- **Cairo Font**: For Arabic typography
-
 ---
 
-**حقيقة (Haqiqa)** - Bringing truth to Palestinian news through technology.
+**حقيقة (Haqiqa)** - Bringing truth to Arabic news through advanced AI technology.
