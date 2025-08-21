@@ -1,3 +1,15 @@
+---
+title: Haqiqa Arabic Fake News Detector
+emoji: 📰
+colorFrom: blue
+colorTo: green
+sdk: gradio
+sdk_version: 5.40.0
+app_file: app.py
+pinned: false
+license: apache-2.0
+---
+
 # حقيقة (Haqiqa) - AI-Powered Arabic News Verification API 🤖
 
 **High-performance machine learning API for detecting fake news in Arabic content**
